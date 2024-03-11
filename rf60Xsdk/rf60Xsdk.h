@@ -109,6 +109,8 @@ public:
 
   void close_serial_port();
 
+  bool get_raw_measure_uart(char *bufferArray, size_t size);
+
   bool get_single_measure(void *measure);
 
   bool send_command(COMMAND_UART value);
@@ -187,7 +189,8 @@ public:
    * @return True if the measure was successfully retrieved, false otherwise.
    */
   template <typename T> bool get_measure_udp(T &protocolUDP);
-
+  protected:
+  uint32_t m_NetworkAddress{1};
 private:
   std::pair<bool, std::string> get_ip_address(CODE::PARAM_NAME_KEY key);
   template <typename T> std::pair<bool, T> get_param(CODE::PARAM_NAME_KEY key);
@@ -201,9 +204,9 @@ private:
    * @return A pair of bool and U, indicating the success of the operation and
    * the value of the underlying type of the enum T.
    */
-  template <typename T, typename U = typename std::enable_if<
+  template <typename T, typename U = typename std::enable_if_t<
                             std::is_enum<T>::value,
-                            typename std::underlying_type<T>::type>::type>
+                            typename std::underlying_type_t<T>>>
   std::pair<bool, U> get_param_2(T key);
 
   template <typename T>
@@ -223,7 +226,6 @@ private:
   };
 
   std::unique_ptr<SerialManager> m_SerialManager{nullptr};
-  uint32_t m_NetworkAddress{1};
   std::chrono::milliseconds m_Timer{5000};
 };
 

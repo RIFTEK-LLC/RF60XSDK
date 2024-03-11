@@ -34,8 +34,8 @@ rf60x::~rf60x() = default;
 rf60x::rf60x() : m_SerialManager(std::make_unique<SerialManager>()) {}
 
 rf60x::rf60x(const rf60x &other)
-    : m_SerialManager(std::make_unique<SerialManager>()),
-      m_NetworkAddress(other.m_NetworkAddress), m_Timer(other.m_Timer) {}
+    : m_NetworkAddress(other.m_NetworkAddress),
+      m_SerialManager(std::make_unique<SerialManager>()), m_Timer(other.m_Timer) {}
 
 rf60x &rf60x::operator=(const rf60x &other) {
   if (this != &other) {
@@ -79,8 +79,8 @@ rf60x &rf60x::operator=(rf60x &&other) noexcept {
  */
 uart_hello_t rf60x::hello_msg_uart() {
   // Construct the command buffer
-  char ucBuffer[2];
-  ucBuffer[0] = m_NetworkAddress & 0xFF;
+  char ucBuffer[2]{};
+  ucBuffer[0] = static_cast<char>(m_NetworkAddress & 0xFF);
   ucBuffer[1] = 0x80 | (static_cast<char>(RF60X_COMMAND::HELLO) & 0x0F);
 
   // Send the command buffer to the device
@@ -325,6 +325,35 @@ bool rf60x::open_serial_port(std::string comPortName, uint32_t baudRate) {
 
 void rf60x::close_serial_port() { m_SerialManager->close_serial_port(); }
 
+bool rf60x::get_raw_measure_uart(char *bufferArray, size_t size)
+{
+    size_t sequenceLength{0};
+    char tempByteBuffer{0};
+
+    while (sequenceLength != size) {
+        try {
+            if (!m_SerialManager->read_command(&tempByteBuffer, 1)) {
+                return false;
+            }
+
+            bool isConsistent = checkLowByteConsistency(tempByteBuffer, 1);
+            if (isConsistent || checkLowByteConsistency(tempByteBuffer, 0)) {
+                bufferArray[sequenceLength++] = tempByteBuffer;
+            } else {
+                std::fill_n(bufferArray, size, 0);
+                sequenceLength = 0;
+                bufferArray[sequenceLength++] = tempByteBuffer;
+            }
+        } catch (std::exception &e) {
+            std::cout << "Error: " << e.what() << std::endl;
+            return false;
+        }
+    }
+
+    return true;
+
+}
+
 bool rf60x::get_single_measure(void *measure) {
 
   if (!send_command(COMMAND_UART::GETRESULT)) {
@@ -380,30 +409,10 @@ bool rf60x::request_custom_command(char *data, uint8_t size) {
 }
 
 bool rf60x::get_measure_uart(void *measure, PROTOCOL_MEASURE_UART type) {
-  char tempByteBuffer = 0;
   size_t sizeType = static_cast<size_t>(type);
-  size_t sequenceLength = 0;
-
   char tempButeBufferArray[12];
-  while (sequenceLength != sizeType) {
-    try {
-      if (!m_SerialManager->read_command(&tempByteBuffer, 1)) {
-        return false;
-      }
 
-      bool isConsistent = checkLowByteConsistency(tempByteBuffer, 1);
-      if (isConsistent || checkLowByteConsistency(tempByteBuffer, 0)) {
-        tempButeBufferArray[sequenceLength++] = tempByteBuffer;
-      } else {
-        std::fill_n(tempButeBufferArray, sizeType, 0);
-        sequenceLength = 0;
-        tempButeBufferArray[sequenceLength++] = tempByteBuffer;
-      }
-    } catch (std::exception &e) {
-      std::cout << "Error: " << e.what() << std::endl;
-      return false;
-    }
-  }
+  if(!get_raw_measure_uart(tempButeBufferArray,sizeType)) return false;
 
   switch (type) {
   case PROTOCOL_MEASURE_UART::UART_STREAM_MEASURE_T: {
@@ -712,11 +721,11 @@ std::pair<bool, SAMPLING_MODE> rf60x::get_sampling_mode() {
 }
 
 std::pair<bool, uint8_t> rf60x::get_network_address() {
-  return get_param_2(CODE::PARAM_NAME_KEY_BYTE::POWER_ANALOG_OUTPUT);
+  return get_param_2(CODE::PARAM_NAME_KEY_BYTE::NETWORK_ADDRESS_UART);
 }
 
 std::pair<bool, uint8_t> rf60x::get_baute_rate() {
-  return get_param_2(CODE::PARAM_NAME_KEY_BYTE::POWER_ANALOG_OUTPUT);
+  return get_param_2(CODE::PARAM_NAME_KEY_BYTE::BAUD_RATE_UART);
 }
 
 std::pair<bool, uint8_t> rf60x::get_number_of_averaged_values() {
@@ -846,8 +855,10 @@ std::pair<bool, std::string> rf60x::get_ip_address(CODE::PARAM_NAME_KEY key) {
         return {false, "An error occurred while reading the query response."};
       }
 
+
       oss << static_cast<int>((ip_values.at(0) & 0x0F) |
                               ((ip_values.at(1) & 0x0F) << 4));
+
       ip_values.clear();
       if (i < 3) {
         oss << ".";

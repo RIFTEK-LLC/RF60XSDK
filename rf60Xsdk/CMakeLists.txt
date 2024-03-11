@@ -16,7 +16,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Enabling export of all symbols to create a dynamic library
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # creating output directory architecture in accordance with GNU guidelines
 set(BINARY_DIR "${CMAKE_BINARY_DIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BINARY_DIR}/bin")
@@ -42,15 +42,16 @@ set(SOURCES ${CPP_FILES} ${H_FILES})
 #
 # TARGET create target and add include path
 #
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES}
+    rf60xencoder.h rf60xencoder.cpp)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/)
 
 target_include_directories(${PROJECT_NAME}
-                           PUBLIC ${asio_SOURCE_DIR}/asio/include)
+                           PRIVATE ${asio_SOURCE_DIR}/asio/include)
 target_include_directories(${PROJECT_NAME}
-                           PUBLIC ${asio_SOURCE_DIR}/asio/include/asio/detail)
+                           PRIVATE ${asio_SOURCE_DIR}/asio/include/asio/detail)
 
 if(MINGW)
   target_compile_definitions(${PROJECT_NAME} PUBLIC _WIN32_WINNT=0x0601)
@@ -63,10 +64,21 @@ get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
 #
 # INSTALL install header files, generate .lib or .dll file.
 #
+# include the GNUInstallDirs module to get the canonical install paths defined
+include(GNUInstallDirs)
+
+# Install the library and export the CMake targets
 install(
-  TARGETS ${PROJECT_NAME}
-  EXPORT ${PROJECT_NAME}
-  LIBRARY DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/build/bin/
-  RUNTIME DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/build/bin/
-          CONFIGURATIONS DEBUG|RELEASE)
-install(FILES ${H_FILES} DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/build/include)
+    TARGETS  ${PROJECT_NAME}
+    EXPORT  ${PROJECT_NAME}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Library
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Library
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Library
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT Library
+    CONFIGURATIONS DEBUG|RELEASE)
+
+# install the public headers
+install(FILES ${H_FILES} DESTINATION include COMPONENT Library)
+
+
+

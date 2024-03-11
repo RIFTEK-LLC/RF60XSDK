@@ -18,7 +18,7 @@ int main() {
   uart_stream_measure_t measure;
 
   // Create a unique pointer to an rf60x object
-  std::unique_ptr<rf60x> dev = std::make_unique<rf60x>();
+  auto dev = std::make_unique<rf60x>();
 
   // Set network address(UART) and open serial port
   dev->bind_network_address(1);
@@ -55,8 +55,7 @@ int main() {
     if (dev->get_measure_uart(&measure,
                               PROTOCOL_MEASURE_UART::UART_STREAM_MEASURE_T)) {
       std::cout << "Measure : "
-                << static_cast<double>(measure.value * hello.deviceRange /
-                                       16384.0)
+                << (measure.value * hello.deviceRange) /16384.0
                 << " mm,"
                 << "  measurement status : "
                 << static_cast<uint32_t>(measure.status) << std::endl;
@@ -73,4 +72,6 @@ int main() {
   }
 
   dev->close_serial_port();
+
+  return 0;
 }

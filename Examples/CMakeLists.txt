@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(SDK)
+project(Examples)
 
 
 option(EXAMPLE_SDK_CPP "Example CPP is built if enabled" ON)

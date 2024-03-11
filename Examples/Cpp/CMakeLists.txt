@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.18)
-project(SDK)
+project(Examples_CPP)
 
 
 option(EXAMPLE_SDK_PARAMS "Example sdk is built if enabled" ON)
 option(EXAMPLE_SDK_UART_MEASURE "Example sdk is built if enabled" ON)
 option(EXAMPLE_SDK_UDP_MEASURE "Example sdk is built if enabled" ON)
-
+option(EXAMPLE_SDK_ENCODER "Example sdk is built if enabled" ON)
 ###############################################################################
 ## INCLUDING SUBDIRECTORIES
 ## Adding subdirectories according to the configuration
@@ -22,3 +22,9 @@ endif()
 if(EXAMPLE_SDK_UDP_MEASURE)
     add_subdirectory(RF60X_UDP_Measure)
 endif()
+
+if(EXAMPLE_SDK_ENCODER)
+    add_subdirectory(RF60X_ENCODER)
+endif()
+
+

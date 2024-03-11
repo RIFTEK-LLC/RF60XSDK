@@ -43,4 +43,6 @@ int main() {
 
   // Disconnect from the device via UDP
   dev->disconnect_udp();
+
+  return 0;
 }
