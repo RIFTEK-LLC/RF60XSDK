@@ -13,6 +13,17 @@ namespace SDK {
 namespace SCANNERS {
 namespace RF60X {
 
+/**
+ * Check the consistency of the low byte of a given byte.
+ *
+ * This function checks whether the low byte of the given byte is consistent with the previous low byte.
+ * If the reset flag is set to true, the function resets the low byte to 0 and returns 0.
+ * If the reset flag is set to false, the function updates the low byte with the current low byte of the given byte.
+ *
+ * @param byte The byte to check the low byte consistency.
+ * @param reset Flag indicating whether to reset the low byte or not.
+ * @return 1 if the low byte is consistent, 0 otherwise.
+ */
 int checkLowByteConsistency(const unsigned char byte, bool reset) {
   static unsigned char lowByte = 0;
 
@@ -26,10 +37,27 @@ int checkLowByteConsistency(const unsigned char byte, bool reset) {
   return 1;
 }
 
+/**
+ * Replaces specific bits in a byte with new values.
+ *
+ * @param byte: The original byte.
+ * @param replacement: The new value to replace the bits with.
+ * @param mask: The mask indicating which bits to replace.
+ * @return The byte with the specified bits replaced.
+ */
 uint8_t replaceBits(uint8_t byte, uint8_t replacement, uint8_t mask) {
   return (byte & ~mask) | (replacement & mask);
 }
 
+/**
+ * @brief Destructor for the rf60x class.
+ * 
+ * This destructor is responsible for cleaning up any resources allocated by the rf60x class.
+ * It is automatically called when an object of the rf60x class goes out of scope or is explicitly deleted.
+ * 
+ * @note This destructor is set to the default implementation.
+ * 
+ */
 rf60x::~rf60x() = default;
 rf60x::rf60x() : m_SerialManager(std::make_unique<SerialManager>()) {}
 
@@ -51,12 +79,9 @@ rf60x &rf60x::operator=(const rf60x &other) {
 }
 
 rf60x::rf60x(rf60x &&other) noexcept
-    : m_SerialManager(std::move(other.m_SerialManager)),
-      m_NetworkAddress(other.m_NetworkAddress), m_Timer(other.m_Timer) {
+    : m_NetworkAddress{std::exchange(other.m_NetworkAddress,0)},
+      m_SerialManager{std::exchange(other.m_SerialManager,nullptr)}, m_Timer{std::exchange(other.m_Timer,std::chrono::milliseconds(0))} {
 
-  other.m_SerialManager = nullptr;
-  other.m_NetworkAddress = 0;
-  other.m_Timer = std::chrono::milliseconds(0);
 }
 
 rf60x &rf60x::operator=(rf60x &&other) noexcept {
@@ -81,7 +106,7 @@ uart_hello_t rf60x::hello_msg_uart() {
   // Construct the command buffer
   char ucBuffer[2]{};
   ucBuffer[0] = static_cast<char>(m_NetworkAddress & 0xFF);
-  ucBuffer[1] = 0x80 | (static_cast<char>(RF60X_COMMAND::HELLO) & 0x0F);
+  ucBuffer[1] = static_cast<char>(0x80 | (static_cast<char>(RF60X_COMMAND::HELLO) & 0x0F));
 
   // Send the command buffer to the device
   if (!request_custom_command(ucBuffer, 2)) {
@@ -874,7 +899,7 @@ std::pair<bool, std::string> rf60x::get_ip_address(CODE::PARAM_NAME_KEY key) {
 uint32_t rf60x::converIPString(const std::string &str) {
   uint8_t ipValues[4];
 
-  int result = sscanf_s(str.c_str(), "%hhu.%hhu.%hhu.%hhu", &ipValues[0],
+  int result = sscanf(str.c_str(), "%hhu.%hhu.%hhu.%hhu", &ipValues[0],
                         &ipValues[1], &ipValues[2], &ipValues[3]);
 
   return (ipValues[0] << 24) | (ipValues[1] << 16) | (ipValues[2] << 8) |
