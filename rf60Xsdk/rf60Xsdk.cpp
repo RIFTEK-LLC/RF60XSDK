@@ -188,7 +188,7 @@ bool rf60x::set_AL_mode(AL_MODE value) {
 
   if (!currentValue.first)
     return false;
-  uint8_t mask = 0b01001100; // Маска для определения заменяемых битов
+  uint8_t mask = 0b01001100;
   uint8_t newValue =
       replaceBits(currentValue.second, static_cast<uint8_t>(value), mask);
 
@@ -201,7 +201,7 @@ bool rf60x::set_averaging_mode(AVERAGING_MODE value) {
 
   if (!currentValue.first)
     return false;
-  uint8_t mask = 0b00100000; // Маска для определения заменяемых битов
+  uint8_t mask = 0b00100000;
   uint8_t newValue =
       replaceBits(currentValue.second, static_cast<uint8_t>(value), mask);
 
@@ -214,7 +214,7 @@ bool rf60x::set_analog_ouput_mode(ANALOG_OUTPUT_MODE value) {
 
   if (!currentValue.first)
     return false;
-  uint8_t mask = 0b00000010; // Маска для определения заменяемых битов
+  uint8_t mask = 0b00000010;
   uint8_t newValue =
       replaceBits(currentValue.second, static_cast<uint8_t>(value), mask);
 
@@ -227,7 +227,7 @@ bool rf60x::set_sampling_mode(SAMPLING_MODE value) {
 
   if (!currentValue.first)
     return false;
-  uint8_t mask = 0b00000001; // Маска для определения заменяемых битов
+  uint8_t mask = 0b00000001;
   uint8_t newValue =
       replaceBits(currentValue.second, static_cast<uint8_t>(value), mask);
 
@@ -840,8 +840,7 @@ std::pair<bool, uint8_t> rf60x::get_autostart_of_measurement_stream() {
 
 std::pair<bool, uint8_t> rf60x::get_protol_type() {
 
-  return get_param_2(CODE::PARAM_NAME_KEY_BYTE::USER_POWER);
-  // return get_param<uint16_t>(CODE::PARAM_NAME_KEY::PROTOCOLS_INTERFACE);
+ return get_param<uint16_t>(CODE::PARAM_NAME_KEY::PROTOCOLS_INTERFACE);
 }
 
 bool rf60x::connect_udp(const std::string &hostAddress, uint32_t port) {
