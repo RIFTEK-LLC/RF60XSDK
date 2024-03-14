@@ -15,7 +15,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Enabling export of all symbols to create a dynamic library
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # creating output directory architecture in accordance with GNU guidelines
 set(BINARY_DIR "${CMAKE_BINARY_DIR}")

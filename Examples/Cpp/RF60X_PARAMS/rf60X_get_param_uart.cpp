@@ -28,6 +28,15 @@ int main() {
     std::cout << std::bitset<8>(static_cast<uint8_t>(result.second))
               << std::endl;
   }
+  else{
+      std::cout<<"Error receiving parameter "<<std::endl;
+  }
+
+  auto ipAddress=dev->get_source_ip_address();
+  if(ipAddress.first){
+
+      std::cout<<"IP address: "<<ipAddress.second<<std::endl;
+  }
 
   // Set sensor and handle error
   if (!dev->set_sensor(1)) {

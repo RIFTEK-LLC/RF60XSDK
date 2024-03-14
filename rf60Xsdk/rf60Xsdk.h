@@ -8,7 +8,7 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
-#if (defined _WIN32 && defined RF60X_LIBRARY)
+#if (defined _WIN32)
 #define API_EXPORT __declspec(dllexport)
 #else
 #define API_EXPORT

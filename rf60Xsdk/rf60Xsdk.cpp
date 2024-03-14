@@ -847,7 +847,7 @@ std::pair<bool, std::string> rf60x::get_ip_address(CODE::PARAM_NAME_KEY key) {
       ucBuffer[2] = 0x80 | (param_key & 0x0F);
       ucBuffer[3] = 0x80 | ((param_key >> 4) & 0x0F);
 
-      if (!request_custom_command(ucBuffer, 2)) {
+      if (!request_custom_command(ucBuffer, 4)) {
         return {false, "An error occurred while sending the request."};
       }
 
@@ -881,8 +881,8 @@ uint32_t rf60x::converIPString(const std::string &str) {
          (ipValues[3]);
 }
 
-template bool rf60x::get_measure_udp(udp_measure_t &);
-template bool rf60x::get_measure_udp(binocular_udp_measure_t &);
+template bool API_EXPORT rf60x::get_measure_udp(udp_measure_t &);
+template bool API_EXPORT rf60x::get_measure_udp(binocular_udp_measure_t &);
 
 } // namespace RF60X
 } // namespace SCANNERS
