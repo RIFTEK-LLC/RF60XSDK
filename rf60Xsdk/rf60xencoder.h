@@ -13,8 +13,8 @@ public:
     ~rf60xEncoder()=default;
     bool send_command_encoder(COMMAND_UART_ENCODER value);
     float get_single_valtage_encoder();
-    uint32_t get_single_value_encoder();
-    uint32_t get_stream_value_encoder();
+    int32_t get_single_value_encoder();
+    int32_t get_stream_value_encoder();
     std::pair<bool,uint8_t>  get_mode_encoder();
     bool  get_stream_valtage_encoder(float &value);
 

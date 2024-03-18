@@ -53,6 +53,7 @@ public:
   void disconnect_udp();
 
   bool get_measure_udp(char *data, size_t size);
+  void clear_IO_buffer();
   /**
    * Possible outcome of a read. Set by callbacks, read from main code
    */

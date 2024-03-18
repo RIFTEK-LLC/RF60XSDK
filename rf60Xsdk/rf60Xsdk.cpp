@@ -35,7 +35,8 @@ rf60x::rf60x() : m_SerialManager(std::make_unique<SerialManager>()) {}
 
 rf60x::rf60x(const rf60x &other)
     : m_NetworkAddress(other.m_NetworkAddress),
-      m_SerialManager(std::make_unique<SerialManager>()), m_Timer(other.m_Timer) {}
+      m_SerialManager(std::make_unique<SerialManager>()),
+      m_Timer(other.m_Timer) {}
 
 rf60x &rf60x::operator=(const rf60x &other) {
   if (this != &other) {
@@ -325,33 +326,31 @@ bool rf60x::open_serial_port(std::string comPortName, uint32_t baudRate) {
 
 void rf60x::close_serial_port() { m_SerialManager->close_serial_port(); }
 
-bool rf60x::get_raw_measure_uart(char *bufferArray, size_t size)
-{
-    size_t sequenceLength{0};
-    char tempByteBuffer{0};
+bool rf60x::get_raw_measure_uart(char *bufferArray, size_t size) {
+  size_t sequenceLength{0};
+  char tempByteBuffer{0};
 
-    while (sequenceLength != size) {
-        try {
-            if (!m_SerialManager->read_command(&tempByteBuffer, 1)) {
-                return false;
-            }
+  while (sequenceLength != size) {
+    try {
+      if (!m_SerialManager->read_command(&tempByteBuffer, 1)) {
+        return false;
+      }
 
-            bool isConsistent = checkLowByteConsistency(tempByteBuffer, 1);
-            if (isConsistent || checkLowByteConsistency(tempByteBuffer, 0)) {
-                bufferArray[sequenceLength++] = tempByteBuffer;
-            } else {
-                std::fill_n(bufferArray, size, 0);
-                sequenceLength = 0;
-                bufferArray[sequenceLength++] = tempByteBuffer;
-            }
-        } catch (std::exception &e) {
-            std::cout << "Error: " << e.what() << std::endl;
-            return false;
-        }
+      bool isConsistent = checkLowByteConsistency(tempByteBuffer, 1);
+      if (isConsistent || checkLowByteConsistency(tempByteBuffer, 0)) {
+        bufferArray[sequenceLength++] = tempByteBuffer;
+      } else {
+        std::fill_n(bufferArray, size, 0);
+        sequenceLength = 0;
+        bufferArray[sequenceLength++] = tempByteBuffer;
+      }
+    } catch (std::exception &e) {
+      std::cout << "Error: " << e.what() << std::endl;
+      return false;
     }
+  }
 
-    return true;
-
+  return true;
 }
 
 bool rf60x::get_single_measure(void *measure) {
@@ -366,7 +365,7 @@ bool rf60x::get_single_measure(void *measure) {
 bool rf60x::send_command(COMMAND_UART value) {
   char ucBuffer[2];
 
-  ucBuffer[0] = m_NetworkAddress & 0xFF;
+  ucBuffer[0] = static_cast<char>(m_NetworkAddress & 0xFF);
   ucBuffer[1] = 0x80 | (static_cast<char>(value) & 0x0F);
 
   if (!request_custom_command(ucBuffer, 2)) {
@@ -412,7 +411,8 @@ bool rf60x::get_measure_uart(void *measure, PROTOCOL_MEASURE_UART type) {
   size_t sizeType = static_cast<size_t>(type);
   char tempButeBufferArray[12];
 
-  if(!get_raw_measure_uart(tempButeBufferArray,sizeType)) return false;
+  if (!get_raw_measure_uart(tempButeBufferArray, sizeType))
+    return false;
 
   switch (type) {
   case PROTOCOL_MEASURE_UART::UART_STREAM_MEASURE_T: {
@@ -560,7 +560,7 @@ std::pair<bool, T> rf60x::get_param(CODE::PARAM_NAME_KEY key) {
   size_t num_bytes = sizeof(T);
 
   char ucBuffer[4];
-  ucBuffer[0] = m_NetworkAddress & 0xFF;
+  ucBuffer[0] = static_cast<char>(m_NetworkAddress & 0xFF);
   ucBuffer[1] = 0x80 | (static_cast<char>(RF60X_COMMAND::READPARAM) & 0x0F); //
 
   try {
@@ -601,7 +601,7 @@ bool rf60x::set_param(const T &value, CODE::PARAM_NAME_KEY key) {
   std::cout << "Value: " << value << std::endl;
   std::cout << "Bytes: ";
 
-  ucBuffer[0] = m_NetworkAddress & 0xFF;
+  ucBuffer[0] = static_cast<char>(m_NetworkAddress & 0xFF);
   ucBuffer[1] = 0x80 | (static_cast<uint8_t>(RF60X_COMMAND::WRITEPARAM) & 0x0F);
 
   try {
@@ -635,7 +635,7 @@ template <typename T, typename U> std::pair<bool, U> rf60x::get_param_2(T key) {
   size_t num_bytes = sizeof(T);
 
   char ucBuffer[4];
-  ucBuffer[0] = m_NetworkAddress & 0xFF;
+  ucBuffer[0] = static_cast<char>(m_NetworkAddress & 0xFF);
   ucBuffer[1] =
       0x80 | (static_cast<uint8_t>(RF60X_COMMAND::READPARAM) & 0x0F); //
 
@@ -816,7 +816,12 @@ std::pair<bool, uint8_t> rf60x::get_autostart_of_measurement_stream() {
 std::pair<bool, uint8_t> rf60x::get_protol_type() {
 
   return get_param_2(CODE::PARAM_NAME_KEY_BYTE::USER_POWER);
-  // return get_param<uint16_t>(CODE::PARAM_NAME_KEY::PROTOCOLS_INTERFACE);
+    // return get_param<uint16_t>(CODE::PARAM_NAME_KEY::PROTOCOLS_INTERFACE);
+}
+
+void rf60x::clear_serial_buffer()
+{
+    m_SerialManager->clear_IO_buffer();
 }
 
 bool rf60x::connect_udp(const std::string &hostAddress, uint32_t port) {
@@ -835,7 +840,7 @@ std::pair<bool, std::string> rf60x::get_ip_address(CODE::PARAM_NAME_KEY key) {
   bool result = 0;
 
   char ucBuffer[4];
-  ucBuffer[0] = m_NetworkAddress & 0xFF;
+  ucBuffer[0] = static_cast<char>(m_NetworkAddress & 0xFF);
   ucBuffer[1] = 0x80 | (static_cast<char>(RF60X_COMMAND::READPARAM) & 0x0F); //
 
   try {
@@ -854,7 +859,6 @@ std::pair<bool, std::string> rf60x::get_ip_address(CODE::PARAM_NAME_KEY key) {
       if (!read_custom_command(param_key, 2, ip_values)) {
         return {false, "An error occurred while reading the query response."};
       }
-
 
       oss << static_cast<int>((ip_values.at(0) & 0x0F) |
                               ((ip_values.at(1) & 0x0F) << 4));

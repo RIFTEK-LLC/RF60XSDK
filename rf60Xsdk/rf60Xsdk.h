@@ -178,6 +178,8 @@ public:
 
   std::pair<bool, uint8_t> get_protol_type();
 
+  void clear_serial_buffer();
+
   bool connect_udp(const std::string &hostAddress, uint32_t port);
 
   void disconnect_udp();

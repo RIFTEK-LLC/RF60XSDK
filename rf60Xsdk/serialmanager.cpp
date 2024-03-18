@@ -157,6 +157,22 @@ bool SerialManager::get_measure_udp(char *data, size_t size) {
   return true;
 }
 
+void SerialManager::clear_IO_buffer()
+{
+
+#ifdef __linux__
+    tcflush(port.lowest_layer(),TCIOFLUSH);
+#elif _WIN32
+    PurgeComm(port.native_handle(),PURGE_TXCLEAR);
+    PurgeComm(port.native_handle(),PURGE_RXCLEAR);
+#else
+
+#endif
+
+
+
+}
+
 void SerialManager::read_completed(const std::error_code &error,
                                    const size_t bytesTransferred) {
   if (!error) {

@@ -1,5 +1,5 @@
 #include "rf60xencoder.h"
-
+#include <numeric>
 bool SDK::RFENCODER::rf60xEncoder::send_command_encoder(COMMAND_UART_ENCODER value)
 {
     constexpr char MASK_NETWORK_ADDRESS = 0xFF;
@@ -46,34 +46,48 @@ float SDK::RFENCODER::rf60xEncoder::get_single_valtage_encoder()
     return static_cast<float>(convertedValue/100.0);
 }
 
-uint32_t SDK::RFENCODER::rf60xEncoder::get_single_value_encoder()
+int32_t SDK::RFENCODER::rf60xEncoder::get_single_value_encoder()
 {
     if (!send_command_encoder(COMMAND_UART_ENCODER::GET_VALUE_ENCODER)) {
         return false;
     }
 
-    char bufferArray[4];
-    if(!get_raw_measure_uart(bufferArray,sizeof(uint32_t))) return 0;
+    char bufferArray[8];
+    if(!get_raw_measure_uart(bufferArray,sizeof(bufferArray))) return 0;
 
-    uint32_t result = (static_cast<uint32_t>(bufferArray[0]) << 24) |
-                      (static_cast<uint32_t>(bufferArray[1]) << 16) |
-                      (static_cast<uint32_t>(bufferArray[2]) << 8) |
-                      static_cast<uint32_t>(bufferArray[3]);
+  /*  int32_t result = std::accumulate(std::begin(bufferArray), std::begin(bufferArray), 0, [](int32_t acc, uint8_t val) {
+        return (acc << 4) | (val & 0x0F);
+    });*/
+
+    int32_t  result =
+        static_cast<int32_t>(bufferArray[7] & 0x0F) << 28 |
+        static_cast<int32_t>(bufferArray[6] & 0x0F) << 24 |
+        static_cast<int32_t>(bufferArray[5] & 0x0F) << 20 |
+        static_cast<int32_t>(bufferArray[4] & 0x0F) << 16 |
+        static_cast<int32_t>(bufferArray[3] & 0x0F) << 12 |
+        static_cast<int32_t>(bufferArray[2] & 0x0F) << 8 |
+        static_cast<int32_t>(bufferArray[1] & 0x0F) << 4 |
+        static_cast<int32_t>(bufferArray[0] & 0x0F);
 
 
     return result;
 
 }
 
-uint32_t SDK::RFENCODER::rf60xEncoder::get_stream_value_encoder()
+int32_t SDK::RFENCODER::rf60xEncoder::get_stream_value_encoder()
 {
-    char bufferArray[4];
-    if(!get_raw_measure_uart(bufferArray,sizeof(uint32_t))) return 0;
+    char bufferArray[8];
+    if(!get_raw_measure_uart(bufferArray,sizeof(bufferArray))) return 0;
 
-    uint32_t result = (static_cast<uint32_t>(bufferArray[0]) << 24) |
-                      (static_cast<uint32_t>(bufferArray[1]) << 16) |
-                      (static_cast<uint32_t>(bufferArray[2]) << 8) |
-                      static_cast<uint32_t>(bufferArray[3]);
+    int32_t  result =
+        static_cast<int32_t>(bufferArray[7] & 0x0F) << 28 |
+        static_cast<int32_t>(bufferArray[6] & 0x0F) << 24 |
+        static_cast<int32_t>(bufferArray[5] & 0x0F) << 20 |
+        static_cast<int32_t>(bufferArray[4] & 0x0F) << 16 |
+        static_cast<int32_t>(bufferArray[3] & 0x0F) << 12 |
+        static_cast<int32_t>(bufferArray[2] & 0x0F) << 8 |
+        static_cast<int32_t>(bufferArray[1] & 0x0F) << 4 |
+        static_cast<int32_t>(bufferArray[0] & 0x0F);
 
 
     return result;
