@@ -10,8 +10,8 @@ bool SerialManager::open_serial_port(std::string devName) {
   port.set_option(
       asio::serial_port_base::parity(asio::serial_port_base::parity::even));
   port.set_option(asio::serial_port_base::character_size(8));
-  port.set_option(asio::serial_port_base::flow_control(
-      asio::serial_port_base::flow_control::none));
+  /*port.set_option(asio::serial_port_base::flow_control(
+      asio::serial_port_base::flow_control::none));*/
   port.set_option(asio::serial_port_base::stop_bits(
       asio::serial_port_base::stop_bits::one));
   return true;
