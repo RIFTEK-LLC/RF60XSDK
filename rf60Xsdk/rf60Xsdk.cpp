@@ -14,30 +14,6 @@ namespace SCANNERS {
 namespace RF60X {
 
 /**
- * Check the consistency of the low byte of a given byte.
- *
- * This function checks whether the low byte of the given byte is consistent with the previous low byte.
- * If the reset flag is set to true, the function resets the low byte to 0 and returns 0.
- * If the reset flag is set to false, the function updates the low byte with the current low byte of the given byte.
- *
- * @param byte The byte to check the low byte consistency.
- * @param reset Flag indicating whether to reset the low byte or not.
- * @return 1 if the low byte is consistent, 0 otherwise.
- */
-int checkLowByteConsistency(const unsigned char byte, bool reset) {
-  static unsigned char lowByte = 0;
-
-  if (reset == 0) {
-    lowByte = byte & 0xF0;
-  } else if (lowByte == 0 || (byte & 0xF0) != lowByte) {
-    lowByte = 0;
-    return 0;
-  }
-
-  return 1;
-}
-
-/**
  * Replaces specific bits in a byte with new values.
  *
  * @param byte: The original byte.
@@ -114,54 +90,31 @@ uart_hello_t rf60x::hello_msg_uart() {
   }
 
   // Read the response from the device
-  char tempByteBuffer = 0;
-  char tempButeBufferArray[16];
-  size_t sequenceLength = 0;
-  size_t sizeType = sizeof(uart_hello_t) * 2;
+  char tempButeBufferArray[sizeof(uart_hello_t) * 2];
+  size_t sizeType = sizeof(tempButeBufferArray);
 
-  while (sequenceLength != sizeType) {
-    try {
-      // Read a byte from the device
-      if (!m_SerialManager->read_command(&tempByteBuffer, 1)) {
-        return {}; // Return an empty struct if reading fails
-      }
-
-      // Check the consistency of the received byte
-      bool isConsistent = checkLowByteConsistency(tempByteBuffer, 1);
-      if (isConsistent || checkLowByteConsistency(tempByteBuffer, 0)) {
-        tempButeBufferArray[sequenceLength++] = tempByteBuffer;
-      } else {
-        std::fill_n(tempButeBufferArray, sizeType, 0);
-        sequenceLength = 0;
-        tempButeBufferArray[sequenceLength++] = tempByteBuffer;
-      }
-    } catch (std::exception &e) {
-      std::cout << "Error: " << e.what() << std::endl;
-      return {}; // Return an empty struct if an exception occurs
-    }
-  }
+  if (!read_data_burst(tempButeBufferArray, sizeType))
+    return {};
 
   // Extract specific information from the buffer and assign it to the fields of
   // the struct
   uart_hello_t tempHello = {};
-  if (sequenceLength >= 16) {
-    tempHello.deviceType = (tempButeBufferArray[0] & 0x0F) |
-                           ((tempButeBufferArray[1] & 0x0F) << 4);
-    tempHello.deviceModificaton = (tempButeBufferArray[2] & 0x0F) |
-                                  ((tempButeBufferArray[3] & 0x0F) << 4);
-    tempHello.deviceSerial = (tempButeBufferArray[4] & 0x0F) |
-                             ((tempButeBufferArray[5] & 0x0F) << 4) |
-                             ((tempButeBufferArray[6] & 0x0F) << 8) |
-                             ((tempButeBufferArray[7] & 0x0F) << 12);
-    tempHello.deviceMaxDistance = ((tempButeBufferArray[8] & 0x0F) |
-                                   ((tempButeBufferArray[9] & 0x0F) << 4) |
-                                   ((tempButeBufferArray[10] & 0x0F) << 8) |
-                                   ((tempButeBufferArray[11] & 0x0F) << 12));
-    tempHello.deviceRange = ((tempButeBufferArray[12] & 0x0F) |
-                             ((tempButeBufferArray[13] & 0x0F) << 4) |
-                             ((tempButeBufferArray[14] & 0x0F) << 8) |
-                             ((tempButeBufferArray[15] & 0x0F) << 12));
-  }
+  tempHello.deviceType = (tempButeBufferArray[0] & 0x0F) |
+                         ((tempButeBufferArray[1] & 0x0F) << 4);
+  tempHello.deviceModificaton = (tempButeBufferArray[2] & 0x0F) |
+                                ((tempButeBufferArray[3] & 0x0F) << 4);
+  tempHello.deviceSerial = (tempButeBufferArray[4] & 0x0F) |
+                           ((tempButeBufferArray[5] & 0x0F) << 4) |
+                           ((tempButeBufferArray[6] & 0x0F) << 8) |
+                           ((tempButeBufferArray[7] & 0x0F) << 12);
+  tempHello.deviceMaxDistance = ((tempButeBufferArray[8] & 0x0F) |
+                                 ((tempButeBufferArray[9] & 0x0F) << 4) |
+                                 ((tempButeBufferArray[10] & 0x0F) << 8) |
+                                 ((tempButeBufferArray[11] & 0x0F) << 12));
+  tempHello.deviceRange = ((tempButeBufferArray[12] & 0x0F) |
+                           ((tempButeBufferArray[13] & 0x0F) << 4) |
+                           ((tempButeBufferArray[14] & 0x0F) << 8) |
+                           ((tempButeBufferArray[15] & 0x0F) << 12));
 
   return tempHello;
 }
@@ -350,33 +303,60 @@ bool rf60x::open_serial_port(std::string comPortName, uint32_t baudRate) {
 
 void rf60x::close_serial_port() { m_SerialManager->close_serial_port(); }
 
-bool rf60x::get_raw_measure_uart(char *bufferArray, size_t size)
-{
-    size_t sequenceLength{0};
-    char tempByteBuffer{0};
+bool rf60x::get_raw_measure_uart(char* bufferArray, size_t size) {
+  return read_data_burst(bufferArray, size);
+}
 
-    while (sequenceLength != size) {
-        try {
-            if (!m_SerialManager->read_command(&tempByteBuffer, 1)) {
-                return false;
-            }
+bool rf60x::read_data_burst(char* buffer, size_t size) {
+  size_t read = 0;
+#ifdef DEBUG_READ_DATA_BURST
+  std::cout << "READ " << size << " bytes:";
+#endif
 
-            bool isConsistent = checkLowByteConsistency(tempByteBuffer, 1);
-            if (isConsistent || checkLowByteConsistency(tempByteBuffer, 0)) {
-                bufferArray[sequenceLength++] = tempByteBuffer;
-            } else {
-                std::fill_n(bufferArray, size, 0);
-                sequenceLength = 0;
-                bufferArray[sequenceLength++] = tempByteBuffer;
-            }
-        } catch (std::exception &e) {
-            std::cout << "Error: " << e.what() << std::endl;
-            return false;
-        }
+  while (read != size) {
+    // size > 0 here
+    try {
+      if (!m_SerialManager->read_command(buffer + read, size - read))
+        return false;
+    } catch (const std::exception& e) {
+      std::cout << "Error when reading serial port: " << e.what() << std::endl;
+      return false;
     }
 
-    return true;
+#ifdef DEBUG_READ_DATA_BURST
+    for (size_t i = read; i < size; i++)
+      std::cout << " " << std::hex << (int)((unsigned char) buffer[i]) << std::dec;
+#endif
 
+    // Count the number of bytes from the same burst in the buffer beginning.
+    char byteLo = buffer[0] & 0xF0;
+    while (read < size && (char) (buffer[read] & 0xF0) == byteLo)
+      ++read;
+
+    // If the buffer is inconsistent:
+    // - drop the beginning
+    // - keep only the last consistent bytes.
+    if (read < size) {
+#ifdef DEBUG_READ_DATA_BURST
+      std::cout << " |";
+#endif
+      // Count the number of bytes from the same burst in the buffer end.
+      byteLo = buffer[size - 1] & 0xF0;
+      read = 1;
+      while (read < size && (char) (buffer[size - read - 1] & 0xF0) == byteLo)
+        ++read;
+
+      // Move consistent data from the end to the beginning of the buffer.
+      for (int i = 0; i < read; i++)
+        buffer[i] = buffer[size - read + i];
+    }
+  }
+
+#ifdef DEBUG_READ_DATA_BURST
+  std::cout << "\n";
+#endif
+
+  return true;
 }
 
 bool rf60x::get_single_measure(void *measure) {
@@ -403,29 +383,8 @@ bool rf60x::send_command(COMMAND_UART value) {
 
 bool rf60x::read_custom_command(uint8_t command, uint8_t size,
                                 std::vector<char> &vec_ref) {
-  char tempByteBuffer = 0;
-
-  while (vec_ref.size() != size) {
-    try {
-      if (!m_SerialManager->read_command(&tempByteBuffer, sizeof(size))) {
-        return false;
-      }
-
-      bool isConsistent = checkLowByteConsistency(tempByteBuffer, 1);
-      if (isConsistent || checkLowByteConsistency(tempByteBuffer, 0)) {
-        vec_ref.emplace_back(tempByteBuffer);
-      } else {
-        vec_ref.clear();
-        vec_ref.emplace_back(tempByteBuffer);
-      }
-    } catch (std::exception &e) {
-
-      std::cout << e.what() << std::endl;
-      return false;
-    }
-  }
-
-  return true;
+  vec_ref.resize(size);
+  return read_data_burst(vec_ref.data(), size);
 }
 
 bool rf60x::request_custom_command(char *data, uint8_t size) {
@@ -437,17 +396,13 @@ bool rf60x::get_measure_uart(void *measure, PROTOCOL_MEASURE_UART type) {
   size_t sizeType = static_cast<size_t>(type);
   char tempButeBufferArray[12];
 
-  if(!get_raw_measure_uart(tempButeBufferArray,sizeType)) return false;
+  if (!read_data_burst(tempButeBufferArray, sizeType)) {
+    return false;
+  }
 
   switch (type) {
   case PROTOCOL_MEASURE_UART::UART_STREAM_MEASURE_T: {
     uint8_t tempCNT = (tempButeBufferArray[0] & 0x30) >> 4;
-
-    if ((tempButeBufferArray[1] & 0x30) >> 4 != tempCNT ||
-        (tempButeBufferArray[2] & 0x30) >> 4 != tempCNT ||
-        (tempButeBufferArray[3] & 0x30) >> 4 != tempCNT)
-      return false;
-
     reinterpret_cast<uart_stream_measure_t *>(measure)->count = tempCNT;
 
     reinterpret_cast<uart_stream_measure_t *>(measure)->value =
@@ -477,15 +432,6 @@ bool rf60x::get_measure_uart(void *measure, PROTOCOL_MEASURE_UART type) {
   case PROTOCOL_MEASURE_UART::UART_STREAM_ADVANCED_MEASURE_T: {
     uint8_t tempCNT = (tempButeBufferArray[0] & 0x30) >> 4;
 
-    //  printf("%d %d %d %d",(measure_from_scanner_uart_ti[0] & 0x30) >>
-    //  4,(measure_from_scanner_uart_ti[1] & 0x30) >>
-    //  4,(measure_from_scanner_uart_ti[2] & 0x30) >>
-    //  4,(measure_from_scanner_uart_ti[3] & 0x30) >> 4);
-    if ((tempButeBufferArray[1] & 0x30) >> 4 != tempCNT ||
-        (tempButeBufferArray[2] & 0x30) >> 4 != tempCNT ||
-        (tempButeBufferArray[3] & 0x30) >> 4 != tempCNT)
-      return false;
-
     reinterpret_cast<uart_stream_advanced_measure_t *>(measure)->cnt = tempCNT;
 
     reinterpret_cast<uart_stream_advanced_measure_t *>(measure)->value =
@@ -512,15 +458,6 @@ bool rf60x::get_measure_uart(void *measure, PROTOCOL_MEASURE_UART type) {
 
   case PROTOCOL_MEASURE_UART::UART_STREAM_MODIFIED_MEASURE_T: {
     uint8_t tempCNT = (tempButeBufferArray[0] & 0x30) >> 4;
-
-    //  printf("%d %d %d %d",(measure_from_scanner_uart_ti[0] & 0x30) >>
-    //  4,(measure_from_scanner_uart_ti[1] & 0x30) >>
-    //  4,(measure_from_scanner_uart_ti[2] & 0x30) >>
-    //  4,(measure_from_scanner_uart_ti[3] & 0x30) >> 4);
-    if ((tempButeBufferArray[1] & 0x30) >> 4 != tempCNT ||
-        (tempButeBufferArray[2] & 0x30) >> 4 != tempCNT ||
-        (tempButeBufferArray[3] & 0x30) >> 4 != tempCNT)
-      return false;
 
     // reinterpret_cast<uart_stream_modified_measure_t *>(measure)->cnt =
     // tempCNT;

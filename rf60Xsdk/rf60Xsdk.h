@@ -588,6 +588,8 @@ private:
    * milliseconds.
    */
   std::chrono::milliseconds m_Timer{5000};
+
+  bool read_data_burst(char* buffer, size_t size);
 };
 
 } // namespace RF60X
