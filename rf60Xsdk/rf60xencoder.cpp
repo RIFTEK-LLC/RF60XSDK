@@ -1,4 +1,5 @@
 #include "rf60xencoder.h"
+#include <cstring>
 
 bool SDK::RFENCODER::rf60xEncoder::send_command_encoder(COMMAND_UART_ENCODER value)
 {
