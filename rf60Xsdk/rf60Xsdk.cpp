@@ -749,16 +749,16 @@ std::pair<bool, std::string> rf60x::get_source_ip_address() {
   return get_ip_address(CODE::PARAM_NAME_KEY::THIRD_BYTE_OF_SOURCE_IP_ADDRESS);
 }
 
-std::pair<bool, std::string> rf60x::destination_ip_address() {
+std::pair<bool, std::string> rf60x::get_destination_ip_address() {
   return get_ip_address(
       CODE::PARAM_NAME_KEY::THIRD_BYTE_OF_DESTINATION_IP_ADDRESS);
 }
 
-std::pair<bool, std::string> rf60x::gateway_ip_address() {
+std::pair<bool, std::string> rf60x::get_gateway_ip_address() {
   return get_ip_address(CODE::PARAM_NAME_KEY::THIRD_BYTE_OF_GATEWAY_IP_ADDRESS);
 }
 
-std::pair<bool, std::string> rf60x::subnet_mask() {
+std::pair<bool, std::string> rf60x::get_subnet_mask() {
   return get_ip_address(CODE::PARAM_NAME_KEY::THIRD_BYTE_OF_SUBNET_MASK);
 }
 
@@ -808,7 +808,7 @@ std::pair<bool, std::string> rf60x::get_ip_address(CODE::PARAM_NAME_KEY key) {
       ucBuffer[2] = 0x80 | (param_key & 0x0F);
       ucBuffer[3] = 0x80 | ((param_key >> 4) & 0x0F);
 
-      if (!request_custom_command(ucBuffer, 2)) {
+      if (!request_custom_command(ucBuffer, 4)) {
         return {false, "An error occurred while sending the request."};
       }
 

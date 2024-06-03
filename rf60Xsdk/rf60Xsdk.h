@@ -487,11 +487,11 @@ public:
 
   std::pair<bool, std::string> get_source_ip_address();
 
-  std::pair<bool, std::string> destination_ip_address();
+  std::pair<bool, std::string> get_destination_ip_address();
 
-  std::pair<bool, std::string> gateway_ip_address();
+  std::pair<bool, std::string> get_gateway_ip_address();
 
-  std::pair<bool, std::string> subnet_mask();
+  std::pair<bool, std::string> get_subnet_mask();
 
   std::pair<bool, uint16_t> get_number_of_measurements_in_the_packet();
 
