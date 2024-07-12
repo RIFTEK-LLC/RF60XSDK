@@ -76,8 +76,7 @@ bool SerialManager::connect_udp(const std::string &hostAddress, uint32_t port) {
   using asio::ip::udp;
 
   udp::resolver resolver(io);
-  udp::endpoint endpoint = *resolver.resolve(
-      udp::endpoint(asio::ip::address::from_string(hostAddress), port));
+  udp::endpoint endpoint(asio::ip::address::from_string(hostAddress), port);
 
   try {
     socket.bind(endpoint, ec);
