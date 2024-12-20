@@ -29,7 +29,7 @@ class SerialManager {
 public:
   SerialManager()
       : io(), port(io), timer(io), timeout(5000),
-        socket(io, asio::ip::udp::v4()){};
+        socket(io){}
 
   // CommunicationInterface interface
 public:

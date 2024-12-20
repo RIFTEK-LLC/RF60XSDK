@@ -79,6 +79,7 @@ bool SerialManager::connect_udp(const std::string &hostAddress, uint32_t port) {
   udp::endpoint endpoint(asio::ip::address::from_string(hostAddress), port);
 
   try {
+    socket.open(endpoint.protocol());
     socket.bind(endpoint, ec);
   } catch (std::exception &e) {
 
