@@ -45,6 +45,11 @@ typedef struct {
 #pragma pack(pop)
 
 typedef struct {
+    uint16_t value;
+    uint16_t counter;
+}uart_stream_extended_measure_t;
+
+typedef struct {
   uint16_t value;
   uint8_t count;
   uint8_t status;
@@ -422,6 +427,7 @@ enum class PARAM_KEY_ENCODE{
 
 enum class PROTOCOL_MEASURE_UART : uint8_t {
   UART_STREAM_MEASURE_T = 4,
+  UART_STREAM_EXTENDED_T = 5,  // This parameter has no logical explanation, it is added to avoid breaking the logic of protocol selection during measurement.
   UART_STREAM_ADVANCED_MEASURE_T = 6,
   UART_STREAM_MODIFIED_MEASURE_T = 10,
   UART_RESULT_WITH_ENCODER_T = 12

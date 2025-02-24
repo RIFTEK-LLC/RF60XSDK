@@ -488,6 +488,19 @@ bool rf60x::get_measure_uart(void *measure, PROTOCOL_MEASURE_UART type) {
 
     break;
   }
+  
+  case PROTOCOL_MEASURE_UART::UART_STREAM_EXTENDED_T : {
+    reinterpret_cast<uart_stream_extended_measure_t *>(measure)->value =
+        (tempButeBufferArray[0] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4 |
+        (tempButeBufferArray[2] & 0x0F) << 8 |
+        (tempButeBufferArray[3] & 0x0F) << 12;
+    
+    reinterpret_cast<uart_stream_extended_measure_t *>(measure)->counter =
+       (tempButeBufferArray[4] & 0x0F) | (tempButeBufferArray[5] & 0x0F) << 4 |
+        (tempButeBufferArray[6] & 0x0F) << 8 |
+        (tempButeBufferArray[7] & 0x0F) << 12;
+    break;
+
   }
 
   return true;

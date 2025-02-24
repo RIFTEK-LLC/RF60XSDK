@@ -4,6 +4,7 @@ project(Examples_CPP)
 
 option(EXAMPLE_SDK_PARAMS "Example sdk is built if enabled" ON)
 option(EXAMPLE_SDK_UART_MEASURE "Example sdk is built if enabled" ON)
+option(EXAMPLE_SDK_UART_EXTENDED_MEASURE_PROTOCOLS "Example sdk is built if enabled" ON)
 option(EXAMPLE_SDK_UDP_MEASURE "Example sdk is built if enabled" ON)
 option(EXAMPLE_SDK_ENCODER "Example sdk is built if enabled" ON)
 ###############################################################################
@@ -17,6 +18,10 @@ endif()
 
 if(EXAMPLE_SDK_UART_MEASURE)
     add_subdirectory(RF60X_UART_Measure)
+endif()
+
+if(EXAMPLE_SDK_UART_MEASURE)
+    add_subdirectory(RF60X_UART_MEASURE_EXTENDED_PROTOCOLS)
 endif()
 
 if(EXAMPLE_SDK_UDP_MEASURE)
