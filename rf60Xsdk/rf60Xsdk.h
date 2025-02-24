@@ -502,6 +502,8 @@ public:
 
   std::pair<bool, uint8_t> get_protocol_type();
 
+  void clear_serial_buffer();
+
   /**
    * Connects to a UDP server at the specified host address and port.
    *

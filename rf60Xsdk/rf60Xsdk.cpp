@@ -780,6 +780,12 @@ std::pair<bool, uint8_t> rf60x::get_protocol_type() {
  return get_param<uint16_t>(CODE::PARAM_NAME_KEY::PROTOCOLS_INTERFACE);
 }
 
+void rf60x::clear_serial_buffer()
+{
+    m_SerialManager->clear_IO_buffer();
+}
+
+
 bool rf60x::connect_udp(const std::string &hostAddress, uint32_t port) {
   return m_SerialManager->connect_udp(hostAddress, port);
 }
