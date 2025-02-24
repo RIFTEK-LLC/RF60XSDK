@@ -28,8 +28,8 @@ public:
 class SerialManager {
 public:
   SerialManager()
-      : io(), port(io), timer(io), timeout(5000),
-        socket(io){}
+      :baud_rate(BAUR_RATE_UART::Baud9600), io(), port(io), timer(io), timeout(5000),
+        socket(io), result(ReadResult::resultSuccess), bytesTransferred(0){}
 
   // CommunicationInterface interface
 public:

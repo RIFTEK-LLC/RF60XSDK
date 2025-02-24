@@ -441,6 +441,7 @@ public:
    *  - UART_STREAM_ADVANCED_MEASURE_T;
    *  - UART_STREAM_MODIFIED_MEASURE_T;
    *  - UART_RESULT_WITH_ENCODER_T.
+   *  
    * @return True if the measure was successfully retrieved, false otherwise.
    */
   bool get_measure_uart(void *measure, PROTOCOL_MEASURE_UART type);
@@ -499,7 +500,7 @@ public:
 
   std::pair<bool, uint8_t> get_autostart_of_measurement_stream();
 
-  std::pair<bool, uint8_t> get_protol_type();
+  std::pair<bool, uint8_t> get_protocol_type();
 
   /**
    * Connects to a UDP server at the specified host address and port.
@@ -517,7 +518,7 @@ public:
   /**
    * Retrieves a measure using the UDP protocol.
    *
-   * @tparam T The type of the protocolUDP parameter.
+   * @param T The type of the protocolUDP parameter.
    * @param protocolUDP The UDP protocol object used to retrieve the measure.
    * @return True if the measure was successfully retrieved, false otherwise.
    */
