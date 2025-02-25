@@ -392,118 +392,119 @@ bool rf60x::request_custom_command(char *data, uint8_t size) {
   return m_SerialManager->write_command(data, size);
 }
 
-bool rf60x::get_measure_uart(void *measure, PROTOCOL_MEASURE_UART type) {
-  size_t sizeType = static_cast<size_t>(type);
-  char tempButeBufferArray[12];
+bool rf60x::get_measure_uart(void* measure, PROTOCOL_MEASURE_UART type) {
+    size_t sizeType = static_cast<size_t>(type);
+    char tempButeBufferArray[12];
 
-  if (!read_data_burst(tempButeBufferArray, sizeType)) {
-    return false;
-  }
+    if (!read_data_burst(tempButeBufferArray, sizeType)) {
+        return false;
+    }
 
-  switch (type) {
-  case PROTOCOL_MEASURE_UART::UART_STREAM_MEASURE_T: {
-    uint8_t tempCNT = (tempButeBufferArray[0] & 0x30) >> 4;
-    reinterpret_cast<uart_stream_measure_t *>(measure)->count = tempCNT;
+    switch (type) {
+    case PROTOCOL_MEASURE_UART::UART_STREAM_MEASURE_T: {
+        uint8_t tempCNT = (tempButeBufferArray[0] & 0x30) >> 4;
+        reinterpret_cast<uart_stream_measure_t*>(measure)->count = tempCNT;
 
-    reinterpret_cast<uart_stream_measure_t *>(measure)->value =
-        (tempButeBufferArray[0] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4 |
-        (tempButeBufferArray[2] & 0x0F) << 8 |
-        (tempButeBufferArray[3] & 0x0F) << 12;
-    reinterpret_cast<uart_stream_measure_t *>(measure)->status =
-        (tempButeBufferArray[0] & 0x40) >> 6;
+        reinterpret_cast<uart_stream_measure_t*>(measure)->value =
+            (tempButeBufferArray[0] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4 |
+            (tempButeBufferArray[2] & 0x0F) << 8 |
+            (tempButeBufferArray[3] & 0x0F) << 12;
+        reinterpret_cast<uart_stream_measure_t*>(measure)->status =
+            (tempButeBufferArray[0] & 0x40) >> 6;
 
-    break;
-  }
-  case PROTOCOL_MEASURE_UART::UART_RESULT_WITH_ENCODER_T: {
-    reinterpret_cast<uart_result_with_encoder_t *>(measure)->measure =
-        (tempButeBufferArray[0] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4 |
-        (tempButeBufferArray[2] & 0x0F) << 8 |
-        (tempButeBufferArray[3] & 0x0F) << 12;
-    reinterpret_cast<uart_result_with_encoder_t *>(measure)->rotationMarks =
-        (tempButeBufferArray[4] & 0x0F) | (tempButeBufferArray[5] & 0x0F) << 4 |
-        (tempButeBufferArray[6] & 0x0F) << 8 |
-        (tempButeBufferArray[7] & 0x0F) << 12;
-    reinterpret_cast<uart_result_with_encoder_t *>(measure)->encoderValue =
-        (tempButeBufferArray[8] & 0x0F) | (tempButeBufferArray[9] & 0x0F) << 4 |
-        (tempButeBufferArray[10] & 0x0F) << 8 |
-        (tempButeBufferArray[11] & 0x0F) << 12;
-    break;
-  }
-  case PROTOCOL_MEASURE_UART::UART_STREAM_ADVANCED_MEASURE_T: {
-    uint8_t tempCNT = (tempButeBufferArray[0] & 0x30) >> 4;
+        break;
+    }
+    case PROTOCOL_MEASURE_UART::UART_RESULT_WITH_ENCODER_T: {
+        reinterpret_cast<uart_result_with_encoder_t*>(measure)->measure =
+            (tempButeBufferArray[0] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4 |
+            (tempButeBufferArray[2] & 0x0F) << 8 |
+            (tempButeBufferArray[3] & 0x0F) << 12;
+        reinterpret_cast<uart_result_with_encoder_t*>(measure)->rotationMarks =
+            (tempButeBufferArray[4] & 0x0F) | (tempButeBufferArray[5] & 0x0F) << 4 |
+            (tempButeBufferArray[6] & 0x0F) << 8 |
+            (tempButeBufferArray[7] & 0x0F) << 12;
+        reinterpret_cast<uart_result_with_encoder_t*>(measure)->encoderValue =
+            (tempButeBufferArray[8] & 0x0F) | (tempButeBufferArray[9] & 0x0F) << 4 |
+            (tempButeBufferArray[10] & 0x0F) << 8 |
+            (tempButeBufferArray[11] & 0x0F) << 12;
+        break;
+    }
+    case PROTOCOL_MEASURE_UART::UART_STREAM_ADVANCED_MEASURE_T: {
+        uint8_t tempCNT = (tempButeBufferArray[0] & 0x30) >> 4;
 
-    reinterpret_cast<uart_stream_advanced_measure_t *>(measure)->cnt = tempCNT;
+        reinterpret_cast<uart_stream_advanced_measure_t*>(measure)->cnt = tempCNT;
 
-    reinterpret_cast<uart_stream_advanced_measure_t *>(measure)->value =
-        (tempButeBufferArray[0] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4 |
-        (tempButeBufferArray[2] & 0x0F) << 8 |
-        (tempButeBufferArray[3] & 0x0F) << 12;
-    reinterpret_cast<uart_stream_advanced_measure_t *>(measure)->status =
-        (tempButeBufferArray[0] & 0x40) >> 6;
+        reinterpret_cast<uart_stream_advanced_measure_t*>(measure)->value =
+            (tempButeBufferArray[0] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4 |
+            (tempButeBufferArray[2] & 0x0F) << 8 |
+            (tempButeBufferArray[3] & 0x0F) << 12;
+        reinterpret_cast<uart_stream_advanced_measure_t*>(measure)->status =
+            (tempButeBufferArray[0] & 0x40) >> 6;
 
-    uint8_t advanced =
-        (tempButeBufferArray[4] & 0x0F) | (tempButeBufferArray[5] & 0x0F) << 4;
+        uint8_t advanced =
+            (tempButeBufferArray[4] & 0x0F) | (tempButeBufferArray[5] & 0x0F) << 4;
 
-    reinterpret_cast<uart_stream_advanced_measure_t *>(measure)->status =
-        (advanced >> 0) & 1;
+        reinterpret_cast<uart_stream_advanced_measure_t*>(measure)->status =
+            (advanced >> 0) & 1;
 
-    reinterpret_cast<uart_stream_advanced_measure_t *>(measure)->dir =
-        (advanced >> 1) & 1;
+        reinterpret_cast<uart_stream_advanced_measure_t*>(measure)->dir =
+            (advanced >> 1) & 1;
 
-    reinterpret_cast<uart_stream_advanced_measure_t *>(measure)->cnt =
-        (advanced >> 2) & 1;
+        reinterpret_cast<uart_stream_advanced_measure_t*>(measure)->cnt =
+            (advanced >> 2) & 1;
 
-    break;
-  }
+        break;
+    }
 
-  case PROTOCOL_MEASURE_UART::UART_STREAM_MODIFIED_MEASURE_T: {
-    uint8_t tempCNT = (tempButeBufferArray[0] & 0x30) >> 4;
+    case PROTOCOL_MEASURE_UART::UART_STREAM_MODIFIED_MEASURE_T: {
+        uint8_t tempCNT = (tempButeBufferArray[0] & 0x30) >> 4;
 
-    // reinterpret_cast<uart_stream_modified_measure_t *>(measure)->cnt =
-    // tempCNT;
+        // reinterpret_cast<uart_stream_modified_measure_t *>(measure)->cnt =
+        // tempCNT;
 
-    reinterpret_cast<uart_stream_modified_measure_t *>(measure)->value =
-        (tempButeBufferArray[0] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4 |
-        (tempButeBufferArray[2] & 0x0F) << 8 |
-        (tempButeBufferArray[3] & 0x0F) << 12;
-    reinterpret_cast<uart_stream_modified_measure_t *>(measure)->status =
-        (tempButeBufferArray[0] & 0x40) >> 6;
+        reinterpret_cast<uart_stream_modified_measure_t*>(measure)->value =
+            (tempButeBufferArray[0] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4 |
+            (tempButeBufferArray[2] & 0x0F) << 8 |
+            (tempButeBufferArray[3] & 0x0F) << 12;
+        reinterpret_cast<uart_stream_modified_measure_t*>(measure)->status =
+            (tempButeBufferArray[0] & 0x40) >> 6;
 
-    uint8_t advanced =
-        (tempButeBufferArray[4] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4;
+        uint8_t advanced =
+            (tempButeBufferArray[4] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4;
 
-    reinterpret_cast<uart_stream_modified_measure_t *>(measure)->status =
-        (advanced >> 0) & 1;
+        reinterpret_cast<uart_stream_modified_measure_t*>(measure)->status =
+            (advanced >> 0) & 1;
 
-    reinterpret_cast<uart_stream_modified_measure_t *>(measure)->dir =
-        (advanced >> 1) & 1;
+        reinterpret_cast<uart_stream_modified_measure_t*>(measure)->dir =
+            (advanced >> 1) & 1;
 
-    reinterpret_cast<uart_stream_modified_measure_t *>(measure)->cnt =
-        (advanced >> 2) & 1;
+        reinterpret_cast<uart_stream_modified_measure_t*>(measure)->cnt =
+            (advanced >> 2) & 1;
 
-    reinterpret_cast<uart_stream_modified_measure_t *>(measure)->cnt_stream =
-        (tempButeBufferArray[6] & 0x0F) | (tempButeBufferArray[7] & 0x0F) << 4 |
-        (tempButeBufferArray[8] & 0x0F) << 8 |
-        (tempButeBufferArray[9] & 0x0F) << 12;
+        reinterpret_cast<uart_stream_modified_measure_t*>(measure)->cnt_stream =
+            (tempButeBufferArray[6] & 0x0F) | (tempButeBufferArray[7] & 0x0F) << 4 |
+            (tempButeBufferArray[8] & 0x0F) << 8 |
+            (tempButeBufferArray[9] & 0x0F) << 12;
 
-    break;
-  }
-  
-  case PROTOCOL_MEASURE_UART::UART_STREAM_EXTENDED_T : {
-    reinterpret_cast<uart_stream_extended_measure_t *>(measure)->value =
-        (tempButeBufferArray[0] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4 |
-        (tempButeBufferArray[2] & 0x0F) << 8 |
-        (tempButeBufferArray[3] & 0x0F) << 12;
-    
-    reinterpret_cast<uart_stream_extended_measure_t *>(measure)->counter =
-       (tempButeBufferArray[4] & 0x0F) | (tempButeBufferArray[5] & 0x0F) << 4 |
-        (tempButeBufferArray[6] & 0x0F) << 8 |
-        (tempButeBufferArray[7] & 0x0F) << 12;
-    break;
+        break;
+    }
 
-  }
+    case PROTOCOL_MEASURE_UART::UART_STREAM_EXTENDED_T: {
+        reinterpret_cast<uart_stream_extended_measure_t*>(measure)->value =
+            (tempButeBufferArray[0] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4 |
+            (tempButeBufferArray[2] & 0x0F) << 8 |
+            (tempButeBufferArray[3] & 0x0F) << 12;
 
-  return true;
+        reinterpret_cast<uart_stream_extended_measure_t*>(measure)->counter =
+            (tempButeBufferArray[4] & 0x0F) | (tempButeBufferArray[5] & 0x0F) << 4 |
+            (tempButeBufferArray[6] & 0x0F) << 8 |
+            (tempButeBufferArray[7] & 0x0F) << 12;
+        break;
+
+    }
+
+ return true;
+    }
 }
 
 // enum class someenum
