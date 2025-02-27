@@ -1,5 +1,67 @@
 #include "serialmanager.h"
 
+
+
+//--------------------------
+// Error codes
+//--------------------------
+
+enum class ErrorCode {
+  NoError = 0,
+  SerialPortOpenFailed,
+  SerialPortTimeoutExpired,
+  SerialPortReadError,
+  UDPConnectionFailed,
+  UDPDataReceiveFailed,
+  UnknownError
+};
+
+//--------------------------
+// Exceptions
+//--------------------------
+
+class SerialManagerException : public std::runtime_error {
+public:
+  ErrorCode code;
+  SerialManagerException(ErrorCode code, const std::string& what)
+      : std::runtime_error(what), code(code) {}
+};
+
+class SerialPortOpenError : public SerialManagerException {
+public:
+  SerialPortOpenError(const std::string& what) : SerialManagerException(ErrorCode::SerialPortOpenFailed, what) {}
+};
+
+class SerialPortTimeoutError : public SerialManagerException {
+public:
+  SerialPortTimeoutError(const std::string& what) : SerialManagerException(ErrorCode::SerialPortTimeoutExpired, what) {}
+};
+
+class SerialPortReadError : public SerialManagerException {
+public:
+  SerialPortReadError(const std::string& what) : SerialManagerException(ErrorCode::SerialPortReadError, what) {}
+};
+
+
+class UDPConnectionError : public SerialManagerException {
+public:
+  UDPConnectionError(const std::string& what) : SerialManagerException(ErrorCode::UDPConnectionFailed, what) {} 
+};
+
+class UDPDataReceiveError : public SerialManagerException {
+public:
+  UDPDataReceiveError(const std::string& what) : SerialManagerException(ErrorCode::UDPDataReceiveFailed, what) {}
+};
+
+//--------------------------
+// Constans
+//--------------------------
+static constexpr auto NO_TIMEOUT = asio::chrono::hours(100000);
+static constexpr int ERROR_CODE_WINDOWS_OPERATION_ABORTED = 995;
+static constexpr int ERROR_CODE_LINUX_OPERATION_ABORTED = 125;
+static constexpr int ERROR_CODE_APPLE_OPERATION_ABORTED = 45;
+
+
 bool SerialManager::open_serial_port(std::string devName) {
 
   if (port.is_open())
@@ -83,8 +145,12 @@ bool SerialManager::connect_udp(const std::string &hostAddress, uint32_t port) {
     socket.bind(endpoint, ec);
   } catch (std::exception &e) {
 
-    std::cout << e.what() << std::endl;
+    std::cerr << "Error in " << __FILE__ << ":" << __LINE__ << ": "
+    << typeid(e).name() << ": " << e.what() << std::endl;
   }
+  catch (...) {
+    std::cerr << "Unknown error in " << __FILE__ << ":" << __LINE__ << std::endl;
+}
 
   if (ec) {
     return false;
@@ -96,8 +162,6 @@ bool SerialManager::connect_udp(const std::string &hostAddress, uint32_t port) {
 void SerialManager::disconnect_udp() { socket.close(); }
 
 bool SerialManager::get_measure_udp(char *data, size_t size) {
-  static uint32_t counter = 0;
-
   try {
     io.restart();
     bool dataReceived = false;
@@ -105,17 +169,15 @@ bool SerialManager::get_measure_udp(char *data, size_t size) {
     if (timeout != std::chrono::seconds(0)) {
       timer.expires_from_now(timeout);
     } else {
-      timer.expires_from_now(asio::chrono::hours(100000));
+      timer.expires_from_now(NO_TIMEOUT); // NO_TIMEOUT = asio::chrono::hours(100000);
     }
 
     // Function for timer
     auto handleTimeout = [&](const asio::error_code &error) {
-      if (error != asio::error::operation_aborted) {
+      if (!error || error == asio::error::operation_aborted) {
         if (!dataReceived) {
-          // Actions on a timer without receiving data
-          std::cout << "Timeout expired." << std::endl;
-          io.stop();
-          //  throw(timeout_exception("Timeout expired"));
+            std::cerr << "Timeout expired." << std::endl;
+            throw SerialPortTimeoutError("Timeout in UDP receive"); // Выбрасываем исключение
         }
       }
     };
@@ -125,22 +187,15 @@ bool SerialManager::get_measure_udp(char *data, size_t size) {
         asio::buffer(data, size),
         [&](const asio::error_code &error, size_t bytesReceived) {
           if (!error && bytesReceived > 0) {
-            // Actions with received raw data
-            /*  std::cout << "raw data: "
-                         << std::string(recvBuffer.data(), bytesReceived) <<
-               std::endl;*/
-            // std::cout<<counter++<< " Get data: "
-            //           <<bytesReceived<< std::endl;
             dataReceived = true;
-            //    return dataReceived;
+            udpDataCounter++;
           } else {
             dataReceived = false;
-
-            // return dataReceived;
+            if(error){
+                throw SerialPortReadError(error.message());
+            }
           }
-
           timer.cancel();
-          io.stop();
         });
 
     timer.async_wait(handleTimeout);
@@ -148,14 +203,26 @@ bool SerialManager::get_measure_udp(char *data, size_t size) {
     while (!io.stopped()) {
       io.run_one();
     }
-    // std::cout<<counter<<std::endl;
     return dataReceived;
+    
+  } catch (const SerialManagerException &e) {
+    std::cerr << "Error in " << __FILE__ << ":" << __LINE__ << ": "
+              << typeid(e).name() << ": " << e.what() << std::endl;
+    io.stop();
+    return false; // Возвращаем false при ошибке
   } catch (const std::exception &e) {
-    std::cerr << "Error: " << e.what() << std::endl;
+    std::cerr << "Error in " << __FILE__ << ":" << __LINE__ << ": "
+              << typeid(e).name() << ": " << e.what() << std::endl;
+    io.stop();
+    return false;
   }
-
-  return true;
+  catch (...) {
+    std::cerr << "Unknown error in " << __FILE__ << ":" << __LINE__ << std::endl;
+    io.stop();
+    return false;
+  }
 }
+
 
 void SerialManager::clear_IO_buffer()
 {
@@ -163,8 +230,7 @@ void SerialManager::clear_IO_buffer()
 #ifdef __linux__
     tcflush(port.lowest_layer(), TCIOFLUSH);
 #elif _WIN32
-    PurgeComm(port.native_handle(), PURGE_TXCLEAR);
-    PurgeComm(port.native_handle(), PURGE_RXCLEAR);
+    PurgeComm(port.native_handle(), PURGE_TXCLEAR | PURGE_RXCLEAR);
 #else
 
 #endif
@@ -185,17 +251,17 @@ void SerialManager::read_completed(const std::error_code &error,
   // In case a asynchronous operation is cancelled due to a timeout,
   // each OS seems to have its way to react.
 #ifdef _WIN32
-  if (error.value() == 995)
+  if (error.value() == ERROR_CODE_WINDOWS_OPERATION_ABORTED )
     return; // Windows spits out error 995
 #elif defined(__APPLE__)
-  if (error.value() == 45) {
+  if (error.value() == ERROR_CODE_APPLE_OPERATION_ABORTED) {
     // Bug on OS X, it might be necessary to repeat the setup
     // http://osdir.com/ml/lib.boost.asio.user/2008-08/msg00004.html
     performReadSetup(setupParameters);
     return;
   }
 #else // Linux
-  if (error.value() == 125)
+  if (error.value() == ERROR_CODE_LINUX_OPERATION_ABORTED )
     return; // Linux outputs error 125
 #endif
 

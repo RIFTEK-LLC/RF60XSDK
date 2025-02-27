@@ -1,6 +1,6 @@
 #include "rf60xencoder.h"
 #include <cstring>
-
+#include <stdexcept>
 bool SDK::RFENCODER::rf60xEncoder::send_command_encoder(COMMAND_UART_ENCODER value)
 {
     constexpr char MASK_NETWORK_ADDRESS = 0xFF;
@@ -54,7 +54,7 @@ uint32_t SDK::RFENCODER::rf60xEncoder::get_single_value_encoder()
     }
 
     char bufferArray[4];
-    if(!get_raw_measure_uart(bufferArray,sizeof(uint32_t))) return 0;
+    if (!getRawMeasure(bufferArray, sizeof(uint32_t))) return 0;
 
     uint32_t result = (static_cast<uint32_t>(bufferArray[0]) << 24) |
                       (static_cast<uint32_t>(bufferArray[1]) << 16) |
@@ -69,7 +69,8 @@ uint32_t SDK::RFENCODER::rf60xEncoder::get_single_value_encoder()
 uint32_t SDK::RFENCODER::rf60xEncoder::get_stream_value_encoder()
 {
     char bufferArray[4];
-    if(!get_raw_measure_uart(bufferArray,sizeof(uint32_t))) return 0;
+
+     if (!getRawMeasure(bufferArray, sizeof(uint32_t))) return 0;
 
     uint32_t result = (static_cast<uint32_t>(bufferArray[0]) << 24) |
                       (static_cast<uint32_t>(bufferArray[1]) << 16) |
@@ -78,4 +79,8 @@ uint32_t SDK::RFENCODER::rf60xEncoder::get_stream_value_encoder()
 
 
     return result;
+}
+
+bool SDK::RFENCODER::rf60xEncoder::getRawMeasure(char* buffer, size_t size){
+    return get_raw_measure_uart(buffer, size);
 }
