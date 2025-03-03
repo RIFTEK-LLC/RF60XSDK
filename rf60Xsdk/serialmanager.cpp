@@ -161,7 +161,7 @@ void SerialManager::clear_IO_buffer()
 {
 
 #ifdef __linux__
-    tcflush(port.lowest_layer(), TCIOFLUSH);
+    tcflush(port.lowest_layer().native_handle(), TCIOFLUSH);
 #elif _WIN32
     PurgeComm(port.native_handle(), PURGE_TXCLEAR);
     PurgeComm(port.native_handle(), PURGE_RXCLEAR);
