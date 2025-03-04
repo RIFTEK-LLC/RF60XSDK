@@ -10,7 +10,8 @@ using namespace SDK;
 using namespace SCANNERS;
 using namespace RF60X;
 
-int main() {
+int main()
+{
 
   // Set precision for output
   std::cout.precision(2);
@@ -28,16 +29,21 @@ int main() {
   dev->connect_udp("192.168.1.2", 603);
 
   // Retrieve and output measurement data 20 times
-  for (size_t i = 0; i < 20; i++) {
-    auto result = dev->get_measure_udp(measure);
+  for (size_t i = 0; i < 20; i++)
+  {
 
-    if (result == true) {
+    if (dev->get_measure_udp(measure))
+    {
       // Calculate and output the measured value in millimeters
       std::cout << "Measure  :"
                 << static_cast<double>((measure.rf60xValArray[0].value *
                                         measure.deviceMeasureRange) /
                                        16384.0)
                 << "mm," << std::endl;
+    }
+    else
+    {
+      std::cout << "Measurement not received" << std::endl;
     }
   }
 

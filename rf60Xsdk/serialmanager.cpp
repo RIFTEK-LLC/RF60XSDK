@@ -96,65 +96,61 @@ bool SerialManager::connect_udp(const std::string &hostAddress, uint32_t port) {
 void SerialManager::disconnect_udp() { socket.close(); }
 
 bool SerialManager::get_measure_udp(char *data, size_t size) {
-  static uint32_t counter = 0;
-
   try {
-    io.restart();
-    bool dataReceived = false;
-
-    if (timeout != std::chrono::seconds(0)) {
-      timer.expires_from_now(timeout);
-    } else {
-      timer.expires_from_now(asio::chrono::hours(100000));
-    }
-
-    // Function for timer
-    auto handleTimeout = [&](const asio::error_code &error) {
-      if (error != asio::error::operation_aborted) {
-        if (!dataReceived) {
-          // Actions on a timer without receiving data
-          std::cout << "Timeout expired." << std::endl;
-          io.stop();
-          //  throw(timeout_exception("Timeout expired"));
-        }
+      if (size < 2) {
+          throw std::invalid_argument("Buffer size must be at least 2 bytes");
       }
-    };
 
-    // Starting an asynchronous data reception operation
-    socket.async_receive(
-        asio::buffer(data, size),
-        [&](const asio::error_code &error, size_t bytesReceived) {
-          if (!error && bytesReceived > 0) {
-            // Actions with received raw data
-            /*  std::cout << "raw data: "
-                         << std::string(recvBuffer.data(), bytesReceived) <<
-               std::endl;*/
-            // std::cout<<counter++<< " Get data: "
-            //           <<bytesReceived<< std::endl;
-            dataReceived = true;
-            //    return dataReceived;
-          } else {
-            dataReceived = false;
+      std::atomic<bool> dataReceived{false};
+      asio::error_code ec;
 
-            // return dataReceived;
-          }
+      io.restart();
 
+      if (timeout != std::chrono::seconds(0)) {
+          timer.expires_from_now(timeout);
+      } else {
           timer.cancel();
-          io.stop();
-        });
+      }
 
-    timer.async_wait(handleTimeout);
+      auto handleTimeout = [&](const asio::error_code &error) {
+          if (!error && !dataReceived.load(std::memory_order_acquire)) {
+              std::cout << "Timeout expired." << std::endl;
+              socket.cancel(ec);
+              if (ec) std::cerr << "Cancel error: " << ec.message() << std::endl;
+          }
+      };
 
-    while (!io.stopped()) {
-      io.run_one();
-    }
-    // std::cout<<counter<<std::endl;
-    return dataReceived;
+      socket.async_receive(asio::buffer(data, size),
+          [&](const asio::error_code &error, size_t bytesReceived) {
+              if (!error && bytesReceived > 0) {
+                  if (bytesReceived >= 2) {
+                      const auto first = static_cast<unsigned char>(data[0]);
+                      const auto second = static_cast<unsigned char>(data[1]);
+                      if (first == 0xFF && second == 0x7F) {
+                          std::cout << "Invalid data received: FF 7F" << std::endl;
+                          dataReceived.store(false, std::memory_order_release);
+                          timer.cancel();
+                          return;
+                      }
+                  }
+                  dataReceived.store(true, std::memory_order_release);
+              }
+              timer.cancel();
+          });
+
+      timer.async_wait(handleTimeout);
+
+      if (timeout != std::chrono::seconds(0)) {
+          io.run_for(timeout);
+      } else {
+          io.run();
+      }
+
+      return dataReceived.load(std::memory_order_acquire);
   } catch (const std::exception &e) {
-    std::cerr << "Error: " << e.what() << std::endl;
+      std::cerr << "Error: " << e.what() << std::endl;
+      return false;
   }
-
-  return true;
 }
 
 void SerialManager::clear_IO_buffer()
