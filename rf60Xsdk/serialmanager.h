@@ -18,7 +18,7 @@ class timeout_exception : public std::runtime_error {
 public:
   timeout_exception(const std::string &arg) : runtime_error(arg) {}
 
-  timeout_exception() = default;
+  timeout_exception() = delete;
 };
 
 /**

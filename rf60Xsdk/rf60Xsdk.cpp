@@ -457,10 +457,6 @@ bool rf60x::get_measure_uart(void* measure, PROTOCOL_MEASURE_UART type) {
     }
 
     case PROTOCOL_MEASURE_UART::UART_STREAM_MODIFIED_MEASURE_T: {
-        uint8_t tempCNT = (tempButeBufferArray[0] & 0x30) >> 4;
-
-        // reinterpret_cast<uart_stream_modified_measure_t *>(measure)->cnt =
-        // tempCNT;
 
         reinterpret_cast<uart_stream_modified_measure_t*>(measure)->value =
             (tempButeBufferArray[0] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4 |
@@ -505,6 +501,7 @@ bool rf60x::get_measure_uart(void* measure, PROTOCOL_MEASURE_UART type) {
 
  return true;
     }
+    return false;
 }
 
 // enum class someenum
@@ -855,13 +852,12 @@ std::pair<bool, std::string> rf60x::get_ip_address(CODE::PARAM_NAME_KEY key) {
 uint32_t rf60x::converIPString(const std::string &str) {
   uint8_t ipValues[4];
 
-  int result = sscanf(str.c_str(), "%hhu.%hhu.%hhu.%hhu", &ipValues[0],
+  sscanf(str.c_str(), "%hhu.%hhu.%hhu.%hhu", &ipValues[0],
                         &ipValues[1], &ipValues[2], &ipValues[3]);
 
   return (ipValues[0] << 24) | (ipValues[1] << 16) | (ipValues[2] << 8) |
          (ipValues[3]);
 }
-
 template bool rf60x::get_measure_udp(udp_measure_t &);
 template bool rf60x::get_measure_udp(binocular_udp_measure_t &);
 
