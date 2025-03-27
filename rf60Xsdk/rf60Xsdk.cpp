@@ -359,6 +359,66 @@ bool rf60x::read_data_burst(char* buffer, size_t size) {
   return true;
 }
 
+bool rf60x::execute_flash_command(COMMAND_VALUE_PARAM_FLASH param_value)
+{
+
+    static constexpr std::size_t COMMAND_BUFFER_SIZE = 4;
+    static constexpr std::size_t RESPONSE_BUFFER_SIZE = 2;
+    static constexpr std::uint8_t HIGH_BIT_MASK = 0x80;
+    static constexpr std::uint8_t LOW_NIBBLE_MASK = 0x0F;
+    static constexpr std::uint8_t HIGH_NIBBLE_MASK = 0xF0;
+
+    std::array<char, COMMAND_BUFFER_SIZE> command_buffer;
+
+    const auto command_uart_val = static_cast<std::underlying_type_t<COMMAND_UART>>(COMMAND_UART::FLASH);
+
+
+    const auto param_byte_val = static_cast<std::uint8_t>(param_value);
+
+    command_buffer[0] = static_cast<unsigned char>(m_NetworkAddress & 0xFF);
+    command_buffer[1] = HIGH_BIT_MASK | (static_cast<unsigned char>(command_uart_val) & LOW_NIBBLE_MASK);
+    command_buffer[2] = HIGH_BIT_MASK | (param_byte_val & LOW_NIBBLE_MASK);
+    command_buffer[3] = HIGH_BIT_MASK | ((param_byte_val>>4) & LOW_NIBBLE_MASK);
+
+    if (!request_custom_command(command_buffer.data(), command_buffer.size())) {
+        return false;
+    }
+
+    std::array<char, RESPONSE_BUFFER_SIZE> response_buffer;
+    if (!read_data_burst(response_buffer.data(), response_buffer.size())) {
+
+        return false;
+    }
+
+    const std::uint16_t response_value = static_cast<std::uint8_t>(response_buffer[0] & 0x0F) |
+                                         (static_cast<std::uint8_t>(response_buffer[1]& 0x0F) << 4);
+
+
+    const std::uint16_t expected_value = static_cast<std::uint16_t>(param_value);
+
+    if (response_value != expected_value) {
+
+        return false;
+    }
+
+    return true;
+}
+
+
+bool rf60x::write_params_to_flash() {
+    return execute_flash_command(COMMAND_VALUE_PARAM_FLASH::FLASH);
+}
+
+bool rf60x::write_factory_params() {
+    return execute_flash_command(COMMAND_VALUE_PARAM_FLASH::FACTORY);
+}
+
+bool rf60x::restore_default_params() {
+    return execute_flash_command(COMMAND_VALUE_PARAM_FLASH::RESET_DEFAULT_PARAMS_MEMORY);
+}
+
+
+
 bool rf60x::get_single_measure(void *measure) {
 
   if (!send_command(COMMAND_UART::GETRESULT)) {

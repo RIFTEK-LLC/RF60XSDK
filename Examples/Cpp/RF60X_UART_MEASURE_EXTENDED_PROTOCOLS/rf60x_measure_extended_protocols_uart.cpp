@@ -41,7 +41,7 @@ int main() {
     uart_stream_extended_measure_t measure;
     for (int i = 0; i < 20; ++i) {
         if (dev->get_measure_uart(&measure,
-            PROTOCOL_MEASURE_UART::UART_STREAM_MEASURE_T)) {
+            PROTOCOL_MEASURE_UART::UART_STREAM_EXTENDED_T)) {
             std::cout << "Measure : "
                 << (measure.value * hello.deviceRange) / 16384.0
                 << " mm,"

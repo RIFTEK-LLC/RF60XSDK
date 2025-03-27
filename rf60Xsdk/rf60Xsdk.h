@@ -394,6 +394,15 @@ public:
    */
   bool get_single_measure(void *measure);
 
+
+
+
+  bool write_params_to_flash();
+
+  bool write_factory_params();
+
+  bool restore_default_params();
+
   /**
    * Sends a command via UART.
    *
@@ -593,6 +602,8 @@ private:
   std::chrono::milliseconds m_Timer{5000};
 
   bool read_data_burst(char* buffer, size_t size);
+
+  bool execute_flash_command(COMMAND_VALUE_PARAM_FLASH param_value);
 };
 
 } // namespace RF60X
