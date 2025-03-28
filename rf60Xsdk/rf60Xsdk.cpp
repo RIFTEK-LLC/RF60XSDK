@@ -559,9 +559,10 @@ bool rf60x::get_measure_uart(void* measure, PROTOCOL_MEASURE_UART type) {
 
     }
 
- return true;
+   default:
+ return false;
     }
-    return false;
+    return true;
 }
 
 // enum class someenum
