@@ -77,10 +77,23 @@ bool SerialManager::connect_udp(const std::string &hostAddress, uint32_t port) {
 
   udp::resolver resolver(io);
   udp::endpoint endpoint(asio::ip::address::from_string(hostAddress), port);
-
+  typedef asio::detail::socket_option::integer<SOL_SOCKET, SO_RCVTIMEO> rcv_timeout_option;
   try {
     socket.open(endpoint.protocol());
-    socket.bind(endpoint, ec);
+    socket.bind(endpoint, ec);    
+
+    // Set a timeout for the socket
+    if (timeout != std::chrono::seconds(0)) {
+
+#ifdef _WIN32
+      // Windows: time in milliseconds
+        socket.set_option(rcv_timeout_option{200});
+#else
+        // Linux/POSIX: time in macroseconds
+        socket.set_option(rcv_timeout_option{200000});
+#endif
+    }
+
   } catch (std::exception &e) {
 
     std::cout << e.what() << std::endl;
@@ -151,6 +164,50 @@ bool SerialManager::get_measure_udp(char *data, size_t size) {
       std::cerr << "Error: " << e.what() << std::endl;
       return false;
   }
+}
+
+
+bool SerialManager::get_measure_udp_sync(char *data, size_t size) {
+    try {
+        if (size < 2) {
+            throw std::invalid_argument("Buffer size must be at least 2 bytes");
+        }
+
+
+        asio::error_code ec;
+        asio::ip::udp::endpoint sender_endpoint;
+
+        // For UDP, you need to use receive_from with endpoint
+        size_t bytesReceived = socket.receive_from(
+            asio::buffer(data, size),
+            sender_endpoint,
+            asio::socket_base::message_flags(0),
+            ec);
+
+        if (ec) {
+            if (ec == asio::error::operation_aborted ||
+                ec == asio::error::timed_out) {
+                std::cout << "Timeout expired." << std::endl;
+            } else {
+                std::cerr << "Receive error: " << ec.message() << std::endl;
+            }
+            return false;
+        }
+
+        if (bytesReceived >= 2) {
+            const auto first = static_cast<unsigned char>(data[0]);
+            const auto second = static_cast<unsigned char>(data[1]);
+            if (first == 0xFF && second == 0x7F) {
+                std::cout << "Invalid data received: FF 7F" << std::endl;
+                return false;
+            }
+        }
+
+        return bytesReceived > 0;
+    } catch (const std::exception &e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return false;
+    }
 }
 
 void SerialManager::clear_IO_buffer()

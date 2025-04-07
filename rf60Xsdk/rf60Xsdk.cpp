@@ -869,6 +869,12 @@ template <typename T> bool rf60x::get_measure_udp(T &protocolUDP) {
       reinterpret_cast<char *>(&protocolUDP), sizeof(protocolUDP));
 }
 
+
+template <typename T> bool rf60x::get_measure_udp_sync(T &protocolUDP) {
+    return m_SerialManager->get_measure_udp_sync(
+        reinterpret_cast<char *>(&protocolUDP), sizeof(protocolUDP));
+}
+
 std::pair<bool, std::string> rf60x::get_ip_address(CODE::PARAM_NAME_KEY key) {
   std::vector<char> ip_values;
   bool result = 0;
@@ -921,6 +927,9 @@ uint32_t rf60x::converIPString(const std::string &str) {
 }
 template bool rf60x::get_measure_udp(udp_measure_t &);
 template bool rf60x::get_measure_udp(binocular_udp_measure_t &);
+
+template bool rf60x::get_measure_udp_sync(udp_measure_t &);
+template bool rf60x::get_measure_udp_sync(binocular_udp_measure_t &);
 
 } // namespace RF60X
 } // namespace SCANNERS

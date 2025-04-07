@@ -535,6 +535,18 @@ public:
    */
   template <typename T> bool get_measure_udp(T &protocolUDP);
 
+
+  /**
+   * Retrieves a measure using the UDP protocol.
+   * This method uses synchronous operations for receiving data from a socket.
+   *
+   * @param T The type of the protocolUDP parameter.
+   * @param protocolUDP The UDP protocol object used to retrieve the measure.
+   * @return True if the measure was successfully retrieved, false otherwise.
+   */
+
+  template <typename T> bool get_measure_udp_sync(T &protocolUDP);
+
 protected:
   uint32_t m_NetworkAddress{1};
 
