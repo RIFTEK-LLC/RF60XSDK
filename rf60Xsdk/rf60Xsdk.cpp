@@ -287,7 +287,7 @@ bool rf60x::set_autostart_of_measurement_stream(uint8_t value) {
   return set_param(value, CODE::PARAM_NAME_KEY::AUTO_OF_THE_STREAM);
 }
 
-bool rf60x::set_protol_type(uint8_t value) {
+bool rf60x::set_protocol_type(uint8_t value) {
   return set_param(value, CODE::PARAM_NAME_KEY::PROTOCOLS_INTERFACE);
 }
 
@@ -633,7 +633,7 @@ bool rf60x::set_param(const T &value, CODE::PARAM_NAME_KEY key) {
   const std::uint8_t *bytes = reinterpret_cast<const std::uint8_t *>(&value);
 
   std::cout << "Value: " << value << std::endl;
-  std::cout << "Bytes: ";
+  std::cout << "Bytes: "<<std::endl;
 
   ucBuffer[0] = m_NetworkAddress & 0xFF;
   ucBuffer[1] = 0x80 | (static_cast<uint8_t>(RF60X_COMMAND::WRITEPARAM) & 0x0F);
@@ -849,7 +849,7 @@ std::pair<bool, uint8_t> rf60x::get_autostart_of_measurement_stream() {
 
 std::pair<bool, uint8_t> rf60x::get_protocol_type() {
 
- return get_param<uint16_t>(CODE::PARAM_NAME_KEY::PROTOCOLS_INTERFACE);
+ return get_param<uint8_t>(CODE::PARAM_NAME_KEY::PROTOCOLS_INTERFACE);
 }
 
 void rf60x::clear_serial_buffer()

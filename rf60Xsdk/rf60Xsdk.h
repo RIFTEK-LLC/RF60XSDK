@@ -357,7 +357,7 @@ public:
    * 0 - RIFTEK protocol (default).
    * @return True if the protocol type was successfully set, false otherwise.
    */
-  bool set_protol_type(uint8_t value);
+  bool set_protocol_type(uint8_t value);
 
   //-------------------------------------------------------//
 
