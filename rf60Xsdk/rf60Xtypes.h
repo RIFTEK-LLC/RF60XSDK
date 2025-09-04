@@ -3,7 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-
+#include <cstdint>
 typedef struct {
   uint16_t measure;
   uint16_t rotationMarks;
