@@ -4,19 +4,36 @@ project(SDK)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(ENABLE_SDK_SOURCE "SDK libraries are built if enabled" ON)
 option(ENABLE_SDK_EXAMPLES "Example SDK is built if enabled" ON)
-
+option(ENABLE_RF60X_C "RF60X_C wrapper is built if enabled" OFF)
+option(ENABLE_RF60X_C_WRAPPER "RF60X C wrapper is built if enabled" ON)
+option(BUILD_STATIC_WRAPPER "Build RF60X wrapper with static rf60Xsdk" ON)
 
 ###############################################################################
 ## INCLUDING SUBDIRECTORIES
 ## Adding subdirectories according to the configuration
 ###############################################################################
 
+
+
 if(ENABLE_SDK_SOURCE)
+    set(BUILD_SHARED_LIBS ON)   # Always build rf60Xsdk as SHARED (dll)
     add_subdirectory(rf60Xsdk)
+endif()
+
+# Create a static version of rf60Xsdk for wrapper if needed
+if(ENABLE_SDK_SOURCE AND ENABLE_RF60X_C_WRAPPER AND BUILD_STATIC_WRAPPER)
+    set(BUILD_SHARED_LIBS OFF)
+    set(RF60XSDK_STATIC_BUILD ON)
+    add_subdirectory(rf60Xsdk rf60Xsdk_static_build)
+    unset(RF60XSDK_STATIC_BUILD)
 endif()
 
 if(ENABLE_SDK_EXAMPLES)
     add_subdirectory(Examples)
+endif()
+
+if(ENABLE_RF60X_C_WRAPPER)
+    add_subdirectory(wrapper/RF60X_C)
 endif()
 
 

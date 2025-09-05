@@ -14,6 +14,7 @@ type
   // Opaque pointer for measurements
   AMeasureType = Pointer;
 
+  // Measurement structs from rf60Xtypes.h
 type
   // uart_result_with_encoder_t
   TUartResultWithEncoder = packed record
@@ -113,20 +114,6 @@ type
   end;
 
   // Measurement structs from rf60Xtypes.h
-  TUDPValue = packed record
-    Value: Word;
-    Status: Byte;
-  end;
-
-  TUDPMeasure = packed record
-    rf60xValArray: array[0..167] of TUDPValue;
-    DeviceSerial: Word;
-    DeviceBaseDistance: Word;
-    DeviceMeasureRange: Word;
-    PackCount: Byte;
-    PacketControlSumm: Byte;
-  end;
-
   TStreamMeasure = record
     Value: Word;
     Count: Byte;

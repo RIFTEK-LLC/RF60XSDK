@@ -30,7 +30,7 @@ FetchContent_Declare(
   GIT_TAG d6b95c0188e0359a8cdbdb6571f0cbacf11a538c)
 FetchContent_MakeAvailable(asio)
 
-option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+
 
 # create glob files for *.h, *.cpp
 file(GLOB H_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
@@ -41,21 +41,28 @@ set(SOURCES ${CPP_FILES} ${H_FILES})
 #
 # TARGET create target and add include path
 #
-add_library(${PROJECT_NAME} ${SOURCES}
-    rf60xencoder.h rf60xencoder.cpp)
-set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
+if(RF60XSDK_STATIC_BUILD)
+    add_library(${PROJECT_NAME}_static STATIC ${SOURCES}
+        rf60xencoder.h rf60xencoder.cpp)
+    set(TARGET_NAME ${PROJECT_NAME}_static)
+else()
+    add_library(${PROJECT_NAME} ${SOURCES}
+        rf60xencoder.h rf60xencoder.cpp)
+    set(TARGET_NAME ${PROJECT_NAME})
+endif()
+set_target_properties(${TARGET_NAME} PROPERTIES PREFIX "")
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/)
+target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/)
 
-target_include_directories(${PROJECT_NAME}
+target_include_directories(${TARGET_NAME}
                            PRIVATE ${asio_SOURCE_DIR}/asio/include)
-target_include_directories(${PROJECT_NAME}
+target_include_directories(${TARGET_NAME}
                            PRIVATE ${asio_SOURCE_DIR}/asio/include/asio/detail)
 
 if(MINGW)
-  target_compile_definitions(${PROJECT_NAME} PUBLIC _WIN32_WINNT=0x0601)
-  target_link_libraries(${PROJECT_NAME} PUBLIC ws2_32)
-  target_link_libraries(${PROJECT_NAME} PUBLIC iphlpapi)
+  target_compile_definitions(${TARGET_NAME} PUBLIC _WIN32_WINNT=0x0601)
+  target_link_libraries(${TARGET_NAME} PUBLIC ws2_32)
+  target_link_libraries(${TARGET_NAME} PUBLIC iphlpapi)
 endif(MINGW)
 
 get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
@@ -67,17 +74,16 @@ get_filename_component(_vs_bin_path "${CMAKE_LINKER}" DIRECTORY)
 include(GNUInstallDirs)
 
 # Install the library and export the CMake targets
-install(
-    TARGETS  ${PROJECT_NAME}
-    EXPORT  ${PROJECT_NAME}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Library
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Library
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Library
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT Library
-    CONFIGURATIONS DEBUG|RELEASE)
+if(NOT RF60XSDK_STATIC_BUILD)
+    install(
+        TARGETS  ${TARGET_NAME}
+        EXPORT  ${PROJECT_NAME}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Library
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Library
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Library
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT Library
+        CONFIGURATIONS DEBUG|RELEASE)
+endif()
 
 # install the public headers
 install(FILES ${H_FILES} DESTINATION include COMPONENT Library)
-
-
-
