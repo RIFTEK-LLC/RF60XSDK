@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.18)
 project(SDK)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 option(ENABLE_SDK_SOURCE "SDK libraries are built if enabled" ON)
 option(ENABLE_SDK_EXAMPLES "Example SDK is built if enabled" ON)
 option(ENABLE_RF60X_C "RF60X_C wrapper is built if enabled" OFF)

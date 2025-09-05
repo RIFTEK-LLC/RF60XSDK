@@ -73,8 +73,8 @@ begin
       Writeln('');
 
       // 5. Set a parameter on the device
-      Writeln('Step 5: Setting a parameter (Sensor laser power to 150)...');
-      Success := RF60XDevice.SetSensor(150);
+      Writeln('Step 5: Setting a parameter (Sensor laser power to 5)...');
+      Success := RF60XDevice.SetSensor(5);
       if Success then
       begin
         Writeln('> Successfully set sensor value.');
