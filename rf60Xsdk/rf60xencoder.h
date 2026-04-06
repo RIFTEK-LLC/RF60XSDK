@@ -24,7 +24,10 @@ public:
    * @return The voltage reading as a float. Where the return value is
    * calculated Voltage (V) = Result voltage measurements /100.
    */
-  float get_single_valtage_encoder();
+  float get_single_voltage_encoder();
+
+  [[deprecated("Use get_single_voltage_encoder instead")]]
+  float get_single_valtage_encoder() { return get_single_voltage_encoder(); }
 
   /**
    * Gets the encoder value.
@@ -58,7 +61,10 @@ public:
    *
    * @param value Output parameter to receive the stream of voltage readings.
    */
-  bool get_stream_valtage_encoder(float &value);
+  bool get_stream_voltage_encoder(float &value);
+
+  [[deprecated("Use get_stream_voltage_encoder instead")]]
+  bool get_stream_valtage_encoder(float &value) { return get_stream_voltage_encoder(value); }
 };
 
 } // namespace RFENCODER

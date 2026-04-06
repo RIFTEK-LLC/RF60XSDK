@@ -27,7 +27,7 @@ public:
 class SerialManager {
 public:
   SerialManager()
-      :baud_rate(BAUR_RATE_UART::Baud9600), io(), port(io), timer(io), timeout(5000),
+      :baud_rate(BAUD_RATE_UART::Baud9600), io(), port(io), timer(io), timeout(5000),
         socket(io), result(ReadResult::resultSuccess), bytesTransferred(0){}
 
   // CommunicationInterface interface
@@ -45,7 +45,7 @@ public:
   bool write_command(const char *data, size_t size);
 
   void set_timeout(const std::chrono::duration<int, std::milli> &t);
-  void setBaud_rate(BAUR_RATE_UART newBaud_rate);
+  void setBaud_rate(BAUD_RATE_UART newBaud_rate);
   void timeout_expired(const std::error_code &error);
 
   bool connect_udp(const std::string &hostAddress, uint32_t port);
@@ -68,7 +68,7 @@ public:
                       const size_t bytesTransferred);
 
 private:
-  BAUR_RATE_UART baud_rate;
+  BAUD_RATE_UART baud_rate;
   asio::io_service io;                            ///< Io service object
   asio::serial_port port;                         ///< Serial port object
   asio::high_resolution_timer timer;              ///< Timer for timeout

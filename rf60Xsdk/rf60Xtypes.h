@@ -55,7 +55,7 @@ typedef struct {
   uint16_t value;
   uint8_t count;
   uint8_t status;
-  uint8_t reserverd;
+  uint8_t reserved;
 } uart_stream_measure_t;
 
 typedef struct {
@@ -75,7 +75,7 @@ typedef struct {
 
 typedef struct {
   uint8_t deviceType;
-  uint8_t deviceModificaton;
+  uint8_t deviceModification;
   uint16_t deviceSerial;
   uint16_t deviceMaxDistance;
   uint16_t deviceRange;
@@ -235,7 +235,7 @@ enum class PARAM_NAME_KEY {
   LOW_BYTE_OF_STANDARD_IDENTIFIER,
   HIGH_BYTE_OF_STANDARD_IDENTIFIER,
   ZERO_BYTE_OF_EXTENDED_IDENTIFIER,
-  FIRST_BYTE_OF_EXTENDED_IDENTIFIE,
+  FIRST_BYTE_OF_EXTENDED_IDENTIFIER,
   SECOND_BYTE_OF_EXTENDED_IDENTIFIER,
   THIRD_BYTE_OF_EXTENDED_IDENTIFIER,
   CAN_INTERFACE_IDENTIFIER,
@@ -391,7 +391,7 @@ enum class PARAM_VALUE_TYPE {
   STRING_PARAM_TYPE
 };
 
-enum class BAUR_RATE_UART : uint32_t {
+enum class BAUD_RATE_UART : uint32_t {
   Baud9600 = 9600,
   Baud115200 = 115200,
   Baud230400 = 230400,
@@ -416,9 +416,9 @@ enum class COMMAND_UART_ENCODER{
     WRITEPARAM = 0x03,
     SAVETOFLASH = 0xF4, // 0x04
     LATCHING_RESULT=0x05,
-    GET_VALTAGE = 0x06,
-    RESTORE_FROM_FLASH = 0x04,
-    START_STREAM_VALTAGE = 0x07,
+  GET_VOLTAGE = 0x06,
+  STOP_STREAM_VOLTAGE = 0x05,
+  START_STREAM_VOLTAGE = 0x07,
     STOP_STREAM = 0x08,
     GET_VALUE_ENCODER=0x0B,
     START_STREAM_VALUE_ENCODER=0x0C
@@ -472,7 +472,7 @@ enum class SAMPLING_MODE {
 
 typedef struct {
   SCANNER_TYPE type;
-  BAUR_RATE_UART baud_rate;
+  BAUD_RATE_UART baud_rate;
   uint8_t network_address;
   std::string number_serial_port;
   PROTOCOLS protocol;

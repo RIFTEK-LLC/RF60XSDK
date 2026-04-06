@@ -103,7 +103,7 @@ uart_hello_t rf60x::hello_msg_uart() {
   uart_hello_t tempHello = {};
   tempHello.deviceType = (tempButeBufferArray[0] & 0x0F) |
                          ((tempButeBufferArray[1] & 0x0F) << 4);
-  tempHello.deviceModificaton = (tempButeBufferArray[2] & 0x0F) |
+  tempHello.deviceModification = (tempButeBufferArray[2] & 0x0F) |
                                 ((tempButeBufferArray[3] & 0x0F) << 4);
   tempHello.deviceSerial = (tempButeBufferArray[4] & 0x0F) |
                            ((tempButeBufferArray[5] & 0x0F) << 4) |
@@ -163,7 +163,7 @@ bool rf60x::set_averaging_mode(AVERAGING_MODE value) {
   return set_param(newValue, CODE::PARAM_NAME_KEY::CONTROL_OF_AVERAGING);
 }
 
-bool rf60x::set_analog_ouput_mode(ANALOG_OUTPUT_MODE value) {
+bool rf60x::set_analog_output_mode(ANALOG_OUTPUT_MODE value) {
   auto currentValue =
       get_param_2(CODE::PARAM_NAME_KEY_BYTE::CONTROL_OF_AVERAGING);
 
@@ -193,7 +193,7 @@ bool rf60x::set_network_address(uint8_t value) {
   return set_param(value, CODE::PARAM_NAME_KEY::NETWORK_ADDRESS_UART);
 }
 
-bool rf60x::set_baute_rate(uint8_t value) {
+bool rf60x::set_baud_rate(uint8_t value) {
   return set_param(value, CODE::PARAM_NAME_KEY::BAUD_RATE_UART);
 }
 
@@ -239,7 +239,7 @@ bool rf60x::set_standard_identifier(uint16_t value) {
                    CODE::PARAM_NAME_KEY::LOW_BYTE_OF_STANDARD_IDENTIFIER);
 }
 
-bool rf60x::set_extend_identifier(uint32_t value) {
+bool rf60x::set_extended_identifier(uint32_t value) {
   return set_param(value,
                    CODE::PARAM_NAME_KEY::ZERO_BYTE_OF_EXTENDED_IDENTIFIER);
 }
@@ -281,7 +281,7 @@ bool rf60x::set_number_of_measurements_in_the_packet(uint16_t value) {
                    CODE::LOW_BYTE_OF_THE_NUMBER_OF_MEASUREMENTS_IN_THE_PACKET);
 }
 
-bool rf60x::set_ethernet_inteface(uint8_t value) {
+bool rf60x::set_ethernet_interface(uint8_t value) {
   return set_param(value, CODE::PARAM_NAME_KEY::ETH_INTERFACE_ON_OFF);
 }
 
@@ -295,7 +295,7 @@ bool rf60x::set_protocol_type(uint8_t value) {
 
 bool rf60x::open_serial_port(const std::string &comPortName, uint32_t baudRate) {
   try {
-    m_SerialManager->setBaud_rate(static_cast<BAUR_RATE_UART>(baudRate));
+    m_SerialManager->setBaud_rate(static_cast<BAUD_RATE_UART>(baudRate));
     return m_SerialManager->open_serial_port(comPortName);
   } catch (std::system_error &e) {
     return false;
@@ -711,7 +711,7 @@ std::pair<bool, AVERAGING_MODE> rf60x::get_averaging_mode() {
   return {true, static_cast<AVERAGING_MODE>(currentValue.second & mask)};
 }
 
-std::pair<bool, ANALOG_OUTPUT_MODE> rf60x::get_analog_ouput_mode() {
+std::pair<bool, ANALOG_OUTPUT_MODE> rf60x::get_analog_output_mode() {
   auto currentValue =
       get_param_2(CODE::PARAM_NAME_KEY_BYTE::CONTROL_OF_AVERAGING);
 
@@ -737,7 +737,7 @@ std::pair<bool, uint8_t> rf60x::get_network_address() {
   return get_param_2(CODE::PARAM_NAME_KEY_BYTE::NETWORK_ADDRESS_UART);
 }
 
-std::pair<bool, uint8_t> rf60x::get_baute_rate() {
+std::pair<bool, uint8_t> rf60x::get_baud_rate() {
   return get_param_2(CODE::PARAM_NAME_KEY_BYTE::BAUD_RATE_UART);
 }
 
@@ -783,7 +783,7 @@ std::pair<bool, uint16_t> rf60x::get_standard_identifier() {
       CODE::PARAM_NAME_KEY_USHORT::LOW_BYTE_OF_STANDARD_IDENTIFIER);
 }
 
-std::pair<bool, uint32_t> rf60x::get_extend_identifier() {
+std::pair<bool, uint32_t> rf60x::get_extended_identifier() {
   return get_param_2(
       CODE::PARAM_NAME_KEY_UINT::ZERO_BYTE_OF_EXTENDED_IDENTIFIER);
 }
@@ -818,7 +818,7 @@ std::pair<bool, uint16_t> rf60x::get_number_of_measurements_in_the_packet() {
                          LOW_BYTE_OF_THE_NUMBER_OF_MEASUREMENTS_IN_THE_PACKET);
 }
 
-std::pair<bool, uint8_t> rf60x::get_ethernet_inteface() {
+std::pair<bool, uint8_t> rf60x::get_ethernet_interface() {
   return get_param_2(CODE::PARAM_NAME_KEY_BYTE::ETH_INTERFACE_ON_OFF);
 }
 

@@ -16,7 +16,7 @@ bool SDK::RFENCODER::rf60xEncoder::send_command_encoder(COMMAND_UART_ENCODER val
 }
 
 
-bool SDK::RFENCODER::rf60xEncoder::get_stream_valtage_encoder(float &value)
+bool SDK::RFENCODER::rf60xEncoder::get_stream_voltage_encoder(float &value)
 {
     uart_stream_measure_t tempValue;
 
@@ -33,7 +33,7 @@ bool SDK::RFENCODER::rf60xEncoder::get_stream_valtage_encoder(float &value)
 
 }
 
-float SDK::RFENCODER::rf60xEncoder::get_single_valtage_encoder()
+float SDK::RFENCODER::rf60xEncoder::get_single_voltage_encoder()
 {
     uart_stream_measure_t tempValue;
 

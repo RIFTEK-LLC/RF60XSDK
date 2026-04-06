@@ -122,7 +122,10 @@ public:
    * @return True if the analog output mode was successfully set, false
    * otherwise.
    */
-  bool set_analog_ouput_mode(ANALOG_OUTPUT_MODE value);
+  bool set_analog_output_mode(ANALOG_OUTPUT_MODE value);
+
+  [[deprecated("Use set_analog_output_mode instead")]]
+  bool set_analog_ouput_mode(ANALOG_OUTPUT_MODE value) { return set_analog_output_mode(value); }
 
   /**
    * Sets the sampling mode of the RF60X scanner.
@@ -152,7 +155,10 @@ public:
    * @param value The value to set the baud rate to.
    * @return True if the baud rate was successfully set, false otherwise.
    */
-  bool set_baute_rate(uint8_t value);
+  bool set_baud_rate(uint8_t value);
+
+  [[deprecated("Use set_baud_rate instead")]]
+  bool set_baute_rate(uint8_t value) { return set_baud_rate(value); }
 
   /**
    * Sets the number of averaged values to the specified value.
@@ -252,7 +258,10 @@ public:
    * @return True if the extended identifier was successfully set, false
    * otherwise.
    */
-  bool set_extend_identifier(uint32_t value);
+  bool set_extended_identifier(uint32_t value);
+
+  [[deprecated("Use set_extended_identifier instead")]]
+  bool set_extend_identifier(uint32_t value) { return set_extended_identifier(value); }
 
   /**
    * Sets the CAN interface identifier.
@@ -333,7 +342,10 @@ public:
    * @return True if the Ethernet interface was successfully set, false
    * otherwise.
    */
-  bool set_ethernet_inteface(uint8_t value);
+  bool set_ethernet_interface(uint8_t value);
+
+  [[deprecated("Use set_ethernet_interface instead")]]
+  bool set_ethernet_inteface(uint8_t value) { return set_ethernet_interface(value); }
 
   /**
    * Sets the autostart of the measurement stream to the specified value.
@@ -463,13 +475,19 @@ public:
 
   std::pair<bool, AVERAGING_MODE> get_averaging_mode();
 
-  std::pair<bool, ANALOG_OUTPUT_MODE> get_analog_ouput_mode();
+  std::pair<bool, ANALOG_OUTPUT_MODE> get_analog_output_mode();
+
+  [[deprecated("Use get_analog_output_mode instead")]]
+  std::pair<bool, ANALOG_OUTPUT_MODE> get_analog_ouput_mode() { return get_analog_output_mode(); }
 
   std::pair<bool, SAMPLING_MODE> get_sampling_mode();
 
   std::pair<bool, uint8_t> get_network_address();
 
-  std::pair<bool, uint8_t> get_baute_rate();
+  std::pair<bool, uint8_t> get_baud_rate();
+
+  [[deprecated("Use get_baud_rate instead")]]
+  std::pair<bool, uint8_t> get_baute_rate() { return get_baud_rate(); }
 
   std::pair<bool, uint8_t> get_number_of_averaged_values();
 
@@ -489,7 +507,10 @@ public:
 
   std::pair<bool, uint16_t> get_standard_identifier();
 
-  std::pair<bool, uint32_t> get_extend_identifier();
+  std::pair<bool, uint32_t> get_extended_identifier();
+
+  [[deprecated("Use get_extended_identifier instead")]]
+  std::pair<bool, uint32_t> get_extend_identifier() { return get_extended_identifier(); }
 
   std::pair<bool, uint8_t> get_CAN_interface_identifier();
 
@@ -505,7 +526,10 @@ public:
 
   std::pair<bool, uint16_t> get_number_of_measurements_in_the_packet();
 
-  std::pair<bool, uint8_t> get_ethernet_inteface();
+  std::pair<bool, uint8_t> get_ethernet_interface();
+
+  [[deprecated("Use get_ethernet_interface instead")]]
+  std::pair<bool, uint8_t> get_ethernet_inteface() { return get_ethernet_interface(); }
 
   std::pair<bool, uint8_t> get_autostart_of_measurement_stream();
 
@@ -587,7 +611,7 @@ private:
    * - WRITEPARAM;
    * - SAVETOFLASH;
    * - GETRESULT;
-   * - RESTOREFORMFLASH;
+   *     - RESTOREFROMFLASH;
    * - START_STREAM;
    * - STOP_STREAM;
    */
@@ -597,7 +621,7 @@ private:
     WRITEPARAM = 0x03,
     SAVETOFLASH = 0xF4, // 0x04
     GETRESULT = 0x06,
-    RESTOREFORMFLASH = 0x04,
+    RESTOREFROMFLASH = 0x04,
     START_STREAM = 0x07,
     STOP_STREAM = 0x08
   };

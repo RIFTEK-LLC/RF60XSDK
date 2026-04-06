@@ -257,6 +257,6 @@ void SerialManager::set_timeout(
   timeout = t;
 }
 
-void SerialManager::setBaud_rate(BAUR_RATE_UART newBaud_rate) {
+void SerialManager::setBaud_rate(BAUD_RATE_UART newBaud_rate) {
   baud_rate = newBaud_rate;
 }

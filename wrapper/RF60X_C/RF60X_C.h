@@ -67,7 +67,7 @@ extern "C" {
     // C-style structs
     typedef struct {
         uint8_t deviceType;
-        uint8_t deviceModificaton;
+        uint8_t deviceModification;
         uint16_t deviceSerial;
         uint16_t deviceMaxDistance;
         uint16_t deviceRange;
@@ -96,9 +96,13 @@ extern "C" {
     EXPORTCALL bool set_analog_out(rf60x_device dev, uint8_t value);
     EXPORTCALL bool set_AL_mode(rf60x_device dev, C_AL_MODE value);
     EXPORTCALL bool set_averaging_mode(rf60x_device dev, C_AVERAGING_MODE value);
+    EXPORTCALL bool set_analog_output_mode(rf60x_device dev, C_ANALOG_OUTPUT_MODE value);
+    /** @deprecated Use set_analog_output_mode */
     EXPORTCALL bool set_analog_ouput_mode(rf60x_device dev, C_ANALOG_OUTPUT_MODE value);
     EXPORTCALL bool set_sampling_mode(rf60x_device dev, C_SAMPLING_MODE value);
     EXPORTCALL bool set_network_address(rf60x_device dev, uint8_t value);
+    EXPORTCALL bool set_baud_rate(rf60x_device dev, uint8_t value);
+    /** @deprecated Use set_baud_rate */
     EXPORTCALL bool set_baute_rate(rf60x_device dev, uint8_t value);
     EXPORTCALL bool set_number_of_averaged_values(rf60x_device dev, uint8_t value);
     EXPORTCALL bool set_sampling_period(rf60x_device dev, uint16_t value);
@@ -109,6 +113,8 @@ extern "C" {
     EXPORTCALL bool set_zero_point(rf60x_device dev, uint16_t value);
     EXPORTCALL bool set_CAN_interface_speed(rf60x_device dev, uint8_t value);
     EXPORTCALL bool set_standard_identifier(rf60x_device dev, uint16_t value);
+    EXPORTCALL bool set_extended_identifier(rf60x_device dev, uint32_t value);
+    /** @deprecated Use set_extended_identifier */
     EXPORTCALL bool set_extend_identifier(rf60x_device dev, uint32_t value);
     EXPORTCALL bool set_CAN_interface_identifier(rf60x_device dev, uint8_t value);
     EXPORTCALL bool set_CAN_interface(rf60x_device dev, uint8_t value);
@@ -117,6 +123,8 @@ extern "C" {
     EXPORTCALL bool set_subnet_mask(rf60x_device dev, const char* value);
     EXPORTCALL bool set_source_ip_address(rf60x_device dev, const char* value);
     EXPORTCALL bool set_number_of_measurements_in_the_packet(rf60x_device dev, uint16_t value);
+    EXPORTCALL bool set_ethernet_interface(rf60x_device dev, uint8_t value);
+    /** @deprecated Use set_ethernet_interface */
     EXPORTCALL bool set_ethernet_inteface(rf60x_device dev, uint8_t value);
     EXPORTCALL bool set_autostart_of_measurement_stream(rf60x_device dev, uint8_t value);
     EXPORTCALL bool set_protocol_type(rf60x_device dev, uint8_t value);
@@ -126,9 +134,13 @@ extern "C" {
     EXPORTCALL bool get_analog_out(rf60x_device dev, uint8_t* value_out);
     EXPORTCALL bool get_AL_mode(rf60x_device dev, C_AL_MODE* value_out);
     EXPORTCALL bool get_averaging_mode(rf60x_device dev, C_AVERAGING_MODE* value_out);
+    EXPORTCALL bool get_analog_output_mode(rf60x_device dev, C_ANALOG_OUTPUT_MODE* value_out);
+    /** @deprecated Use get_analog_output_mode */
     EXPORTCALL bool get_analog_ouput_mode(rf60x_device dev, C_ANALOG_OUTPUT_MODE* value_out);
     EXPORTCALL bool get_sampling_mode(rf60x_device dev, C_SAMPLING_MODE* value_out);
     EXPORTCALL bool get_network_address(rf60x_device dev, uint8_t* value_out);
+    EXPORTCALL bool get_baud_rate(rf60x_device dev, uint8_t* value_out);
+    /** @deprecated Use get_baud_rate */
     EXPORTCALL bool get_baute_rate(rf60x_device dev, uint8_t* value_out);
     EXPORTCALL bool get_number_of_averaged_values(rf60x_device dev, uint8_t* value_out);
     EXPORTCALL bool get_sampling_period(rf60x_device dev, uint16_t* value_out);
@@ -139,10 +151,14 @@ extern "C" {
     EXPORTCALL bool get_zero_point(rf60x_device dev, uint16_t* value_out);
     EXPORTCALL bool get_CAN_interface_speed(rf60x_device dev, uint8_t* value_out);
     EXPORTCALL bool get_standard_identifier(rf60x_device dev, uint16_t* value_out);
+    EXPORTCALL bool get_extended_identifier(rf60x_device dev, uint32_t* value_out);
+    /** @deprecated Use get_extended_identifier */
     EXPORTCALL bool get_extend_identifier(rf60x_device dev, uint32_t* value_out);
     EXPORTCALL bool get_CAN_interface_identifier(rf60x_device dev, uint8_t* value_out);
     EXPORTCALL bool get_CAN_interface(rf60x_device dev, uint8_t* value_out);
     EXPORTCALL bool get_number_of_measurements_in_the_packet(rf60x_device dev, uint16_t* value_out);
+    EXPORTCALL bool get_ethernet_interface(rf60x_device dev, uint8_t* value_out);
+    /** @deprecated Use get_ethernet_interface */
     EXPORTCALL bool get_ethernet_inteface(rf60x_device dev, uint8_t* value_out);
     EXPORTCALL bool get_autostart_of_measurement_stream(rf60x_device dev, uint8_t* value_out);
     EXPORTCALL bool get_protocol_type(rf60x_device dev, uint8_t* value_out);

@@ -72,8 +72,12 @@ extern "C" {
         return to_rf60x(dev)->set_averaging_mode(static_cast<AVERAGING_MODE>(value));
     }
 
+    EXPORTCALL bool set_analog_output_mode(rf60x_device dev, C_ANALOG_OUTPUT_MODE value) {
+        return to_rf60x(dev)->set_analog_output_mode(static_cast<ANALOG_OUTPUT_MODE>(value));
+    }
+
     EXPORTCALL bool set_analog_ouput_mode(rf60x_device dev, C_ANALOG_OUTPUT_MODE value) {
-        return to_rf60x(dev)->set_analog_ouput_mode(static_cast<ANALOG_OUTPUT_MODE>(value));
+        return set_analog_output_mode(dev, value);
     }
 
     EXPORTCALL bool set_sampling_mode(rf60x_device dev, C_SAMPLING_MODE value) {
@@ -84,8 +88,12 @@ extern "C" {
         return to_rf60x(dev)->set_network_address(value);
     }
 
+    EXPORTCALL bool set_baud_rate(rf60x_device dev, uint8_t value) {
+        return to_rf60x(dev)->set_baud_rate(value);
+    }
+
     EXPORTCALL bool set_baute_rate(rf60x_device dev, uint8_t value) {
-        return to_rf60x(dev)->set_baute_rate(value);
+        return set_baud_rate(dev, value);
     }
 
     EXPORTCALL bool set_number_of_averaged_values(rf60x_device dev, uint8_t value) {
@@ -124,8 +132,12 @@ extern "C" {
         return to_rf60x(dev)->set_standard_identifier(value);
     }
 
+    EXPORTCALL bool set_extended_identifier(rf60x_device dev, uint32_t value) {
+        return to_rf60x(dev)->set_extended_identifier(value);
+    }
+
     EXPORTCALL bool set_extend_identifier(rf60x_device dev, uint32_t value) {
-        return to_rf60x(dev)->set_extend_identifier(value);
+        return set_extended_identifier(dev, value);
     }
 
     EXPORTCALL bool set_CAN_interface_identifier(rf60x_device dev, uint8_t value) {
@@ -156,8 +168,12 @@ extern "C" {
         return to_rf60x(dev)->set_number_of_measurements_in_the_packet(value);
     }
 
+    EXPORTCALL bool set_ethernet_interface(rf60x_device dev, uint8_t value) {
+        return to_rf60x(dev)->set_ethernet_interface(value);
+    }
+
     EXPORTCALL bool set_ethernet_inteface(rf60x_device dev, uint8_t value) {
-        return to_rf60x(dev)->set_ethernet_inteface(value);
+        return set_ethernet_interface(dev, value);
     }
 
     EXPORTCALL bool set_autostart_of_measurement_stream(rf60x_device dev, uint8_t value) {
@@ -193,10 +209,14 @@ extern "C" {
         return success;
     }
 
-    EXPORTCALL bool get_analog_ouput_mode(rf60x_device dev, C_ANALOG_OUTPUT_MODE* value_out) {
-        auto [success, value] = to_rf60x(dev)->get_analog_ouput_mode();
+    EXPORTCALL bool get_analog_output_mode(rf60x_device dev, C_ANALOG_OUTPUT_MODE* value_out) {
+        auto [success, value] = to_rf60x(dev)->get_analog_output_mode();
         if (success && value_out) *value_out = static_cast<C_ANALOG_OUTPUT_MODE>(value);
         return success;
+    }
+
+    EXPORTCALL bool get_analog_ouput_mode(rf60x_device dev, C_ANALOG_OUTPUT_MODE* value_out) {
+        return get_analog_output_mode(dev, value_out);
     }
 
     EXPORTCALL bool get_sampling_mode(rf60x_device dev, C_SAMPLING_MODE* value_out) {
@@ -211,10 +231,14 @@ extern "C" {
         return success;
     }
 
-    EXPORTCALL bool get_baute_rate(rf60x_device dev, uint8_t* value_out) {
-        auto [success, value] = to_rf60x(dev)->get_baute_rate();
+    EXPORTCALL bool get_baud_rate(rf60x_device dev, uint8_t* value_out) {
+        auto [success, value] = to_rf60x(dev)->get_baud_rate();
         if (success && value_out) *value_out = value;
         return success;
+    }
+
+    EXPORTCALL bool get_baute_rate(rf60x_device dev, uint8_t* value_out) {
+        return get_baud_rate(dev, value_out);
     }
 
     EXPORTCALL bool get_number_of_averaged_values(rf60x_device dev, uint8_t* value_out) {
@@ -271,10 +295,14 @@ extern "C" {
         return success;
     }
 
-    EXPORTCALL bool get_extend_identifier(rf60x_device dev, uint32_t* value_out) {
-        auto [success, value] = to_rf60x(dev)->get_extend_identifier();
+    EXPORTCALL bool get_extended_identifier(rf60x_device dev, uint32_t* value_out) {
+        auto [success, value] = to_rf60x(dev)->get_extended_identifier();
         if (success && value_out) *value_out = value;
         return success;
+    }
+
+    EXPORTCALL bool get_extend_identifier(rf60x_device dev, uint32_t* value_out) {
+        return get_extended_identifier(dev, value_out);
     }
 
     EXPORTCALL bool get_CAN_interface_identifier(rf60x_device dev, uint8_t* value_out) {
@@ -295,10 +323,14 @@ extern "C" {
         return success;
     }
 
-    EXPORTCALL bool get_ethernet_inteface(rf60x_device dev, uint8_t* value_out) {
-        auto [success, value] = to_rf60x(dev)->get_ethernet_inteface();
+    EXPORTCALL bool get_ethernet_interface(rf60x_device dev, uint8_t* value_out) {
+        auto [success, value] = to_rf60x(dev)->get_ethernet_interface();
         if (success && value_out) *value_out = value;
         return success;
+    }
+
+    EXPORTCALL bool get_ethernet_inteface(rf60x_device dev, uint8_t* value_out) {
+        return get_ethernet_interface(dev, value_out);
     }
 
     EXPORTCALL bool get_autostart_of_measurement_stream(rf60x_device dev, uint8_t* value_out) {
@@ -355,7 +387,7 @@ extern "C" {
         uart_hello_t cpp_hello = to_rf60x(dev)->hello_msg_uart();
         C_uart_hello_t c_hello;
         c_hello.deviceType = cpp_hello.deviceType;
-        c_hello.deviceModificaton = cpp_hello.deviceModificaton;
+        c_hello.deviceModification = cpp_hello.deviceModification;
         c_hello.deviceSerial = cpp_hello.deviceSerial;
         c_hello.deviceMaxDistance = cpp_hello.deviceMaxDistance;
         c_hello.deviceRange = cpp_hello.deviceRange;
