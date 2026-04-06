@@ -223,4 +223,3 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed design documentation.
 
 - [RIFTEK Official](http://riftek.com/)
 - [Architecture Docs](ARCHITECTURE.md)
-- [Code Style Guide](CODE_STYLE.md)
