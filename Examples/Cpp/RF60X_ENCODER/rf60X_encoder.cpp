@@ -41,7 +41,7 @@ int main() {
             << std::endl;
 
   // Start streaming voltage values
-  dev->send_command_encoder(COMMAND_UART_ENCODER::START_STREAM_VALTAGE);
+  dev->send_command_encoder(COMMAND_UART_ENCODER::START_STREAM_VOLTAGE);
 
   for (size_t i = 0; i < 10; ++i) {
     float value{0};
