@@ -95,8 +95,8 @@ bool SerialManager::connect_udp(const std::string &hostAddress, uint32_t port) {
     }
 
   } catch (std::exception &e) {
-
-    std::cout << e.what() << std::endl;
+    std::cerr << "connect_udp error: " << e.what() << std::endl;
+    return false;
   }
 
   if (ec) {

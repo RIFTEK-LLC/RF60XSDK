@@ -848,8 +848,7 @@ std::pair<bool, uint8_t> rf60x::get_autostart_of_measurement_stream() {
 }
 
 std::pair<bool, uint8_t> rf60x::get_protocol_type() {
-
- return get_param<uint8_t>(CODE::PARAM_NAME_KEY::PROTOCOLS_INTERFACE);
+  return get_param_2(CODE::PARAM_NAME_KEY_BYTE::PROTOCOLS_INTERFACE);
 }
 
 void rf60x::clear_serial_buffer()
@@ -877,7 +876,6 @@ template <typename T> bool rf60x::get_measure_udp_sync(T &protocolUDP) {
 
 std::pair<bool, std::string> rf60x::get_ip_address(CODE::PARAM_NAME_KEY key) {
   std::vector<char> ip_values;
-  bool result = 0;
 
   char ucBuffer[4];
   ucBuffer[0] = m_NetworkAddress & 0xFF;

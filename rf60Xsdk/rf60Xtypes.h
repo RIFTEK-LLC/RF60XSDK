@@ -44,6 +44,8 @@ typedef struct {
 
 #pragma pack(pop)
 
+#pragma pack(push, 1)
+
 typedef struct {
     uint16_t value;
     uint16_t counter;
@@ -79,6 +81,8 @@ typedef struct {
   uint16_t deviceRange;
 
 } uart_hello_t;
+
+#pragma pack(pop)
 
 typedef struct {
   uint8_t id;
