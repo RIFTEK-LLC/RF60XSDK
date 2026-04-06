@@ -2,7 +2,6 @@
 
 [![C++](https://img.shields.io/badge/C%2B%2B-14-blue.svg)](https://isocpp.org/)
 [![CMake](https://img.shields.io/badge/CMake-3.18%2B-064F8C.svg)](https://cmake.org/)
-[![License](https://img.shields.io/badge/License-Boost%201.0-green.svg)](https://www.boost.org/LICENSE_1_0.txt)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey.svg)]()
 [![CI](https://img.shields.io/github/actions/workflow/status/nikolay-kozhuro/rf60xsdk/c-cpp.yml?branch=master&label=CI&logo=github)]()
 [![Release](https://img.shields.io/github/v/release/nikolay-kozhuro/rf60xsdk?label=Release)]()
@@ -217,12 +216,6 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed design documentation.
 | RF60X | Standard laser displacement scanner |
 | RF60XHS | High-speed variant |
 | RF60xB | Binocular (dual-channel) variant |
-
----
-
-## License / Лицензия
-
-This project is licensed under the **Boost Software License 1.0** — see the [LICENSE](LICENSE) file for details.
 
 ---
 
