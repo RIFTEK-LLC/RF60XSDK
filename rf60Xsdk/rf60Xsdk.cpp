@@ -2,7 +2,9 @@
 
 #include "serialmanager.h"
 #include <algorithm>
+#include <cstdio>
 #include <exception>
+#include <sstream>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -571,19 +573,6 @@ bool rf60x::get_measure_uart(void* measure, PROTOCOL_MEASURE_UART type) {
 
 // template <someenum T>
 // struct someMap;
-
-// template <> struct someMap<someenum::e1> {using return_t = uint32_t;};
-
-// template <someenum T>
-// typename someMap<T>::return_t foo()
-//{
-//   return 0;
-// }
-
-// void goo()
-//{
-//   foo<someenum::e1>();
-// }
 
 template <typename T>
 std::pair<bool, T> rf60x::get_param(CODE::PARAM_NAME_KEY key) {

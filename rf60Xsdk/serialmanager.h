@@ -1,7 +1,6 @@
 #ifndef SERIALMANAGER_H
 #define SERIALMANAGER_H
 
-// #include "communicationinterface.h"
 #include "asio.hpp"
 #include "asio/placeholders.hpp"
 #include "asio/ts/timer.hpp"
@@ -80,8 +79,6 @@ private:
   enum ReadResult result;  ///< Used by read with timeout
   size_t bytesTransferred; ///< Used by async read callback
   std::error_code error_code;
-  //    ReadSetupParameters setupParameters; ///< Global because used in the OSX
-  //    fix
 };
 
 #endif // SERIALMANAGER_H
