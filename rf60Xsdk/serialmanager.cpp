@@ -1,6 +1,6 @@
 #include "serialmanager.h"
 
-bool SerialManager::open_serial_port(std::string devName) {
+bool SerialManager::open_serial_port(const std::string &devName) {
 
   if (port.is_open())
     return false;
@@ -127,9 +127,7 @@ bool SerialManager::get_measure_udp(char *data, size_t size) {
 
       auto handleTimeout = [&](const asio::error_code &error) {
           if (!error && !dataReceived.load(std::memory_order_acquire)) {
-              std::cout << "Timeout expired." << std::endl;
               socket.cancel(ec);
-              if (ec) std::cerr << "Cancel error: " << ec.message() << std::endl;
           }
       };
 
@@ -140,7 +138,6 @@ bool SerialManager::get_measure_udp(char *data, size_t size) {
                       const auto first = static_cast<unsigned char>(data[0]);
                       const auto second = static_cast<unsigned char>(data[1]);
                       if (first == 0xFF && second == 0x7F) {
-                          std::cout << "Invalid data received: FF 7F" << std::endl;
                           dataReceived.store(false, std::memory_order_release);
                           timer.cancel();
                           return;
@@ -161,7 +158,6 @@ bool SerialManager::get_measure_udp(char *data, size_t size) {
 
       return dataReceived.load(std::memory_order_acquire);
   } catch (const std::exception &e) {
-      std::cerr << "Error: " << e.what() << std::endl;
       return false;
   }
 }
@@ -185,12 +181,6 @@ bool SerialManager::get_measure_udp_sync(char *data, size_t size) {
             ec);
 
         if (ec) {
-            if (ec == asio::error::operation_aborted ||
-                ec == asio::error::timed_out) {
-                std::cout << "Timeout expired." << std::endl;
-            } else {
-                std::cerr << "Receive error: " << ec.message() << std::endl;
-            }
             return false;
         }
 
@@ -198,14 +188,12 @@ bool SerialManager::get_measure_udp_sync(char *data, size_t size) {
             const auto first = static_cast<unsigned char>(data[0]);
             const auto second = static_cast<unsigned char>(data[1]);
             if (first == 0xFF && second == 0x7F) {
-                std::cout << "Invalid data received: FF 7F" << std::endl;
                 return false;
             }
         }
 
         return bytesReceived > 0;
     } catch (const std::exception &e) {
-        std::cerr << "Error: " << e.what() << std::endl;
         return false;
     }
 }
@@ -255,7 +243,7 @@ void SerialManager::read_completed(const std::error_code &error,
   result = resultError;
 }
 
-bool SerialManager::write_command(char *data, size_t size) {
+bool SerialManager::write_command(const char *data, size_t size) {
   size_t countByte = asio::write(port, asio::buffer(data, size));
   if (countByte != size) {
     return false;

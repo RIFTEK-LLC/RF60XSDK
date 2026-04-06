@@ -284,7 +284,7 @@ public:
    * @return True if the destination IP address was successfully set, false
    * otherwise.
    */
-  bool set_destination_ip_address(std::string value);
+  bool set_destination_ip_address(const std::string &value);
 
   /**
    * Sets the gateway IP address to the specified value.
@@ -293,7 +293,7 @@ public:
    * @return True if the gateway IP address was successfully set, false
    * otherwise.
    */
-  bool set_gateway_ip_address(std::string value);
+  bool set_gateway_ip_address(const std::string &value);
 
   /**
    * Sets the subnet mask to the specified value.
@@ -301,7 +301,7 @@ public:
    * @param value The subnet mask value to set.
    * @return True if the subnet mask was successfully set, false otherwise.
    */
-  bool set_subnet_mask(std::string value);
+  bool set_subnet_mask(const std::string &value);
 
   /**
    * Sets the source IP address to the specified value.
@@ -310,7 +310,7 @@ public:
    * @return True if the source IP address was successfully set, false
    * otherwise.
    */
-  bool set_source_ip_address(std::string value);
+  bool set_source_ip_address(const std::string &value);
 
   /**
    * Sets the number of measurements in the packet to the specified value.
@@ -368,7 +368,7 @@ public:
    * @param baudRate The baud rate to use for the serial port.
    * @return True if the serial port was successfully opened, false otherwise.
    */
-  bool open_serial_port(std::string comPortName, uint32_t baudRate);
+  bool open_serial_port(const std::string &comPortName, uint32_t baudRate);
 
   /**
    * Closes the currently open serial port.

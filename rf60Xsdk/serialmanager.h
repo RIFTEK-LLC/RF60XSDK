@@ -40,10 +40,10 @@ public:
    * serial device
    */
 
-  bool open_serial_port(std::string devName);
+  bool open_serial_port(const std::string &devName);
   void close_serial_port();
   bool read_command(char *data, size_t size);
-  bool write_command(char *data, size_t size);
+  bool write_command(const char *data, size_t size);
 
   void set_timeout(const std::chrono::duration<int, std::milli> &t);
   void setBaud_rate(BAUR_RATE_UART newBaud_rate);

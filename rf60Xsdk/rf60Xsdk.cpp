@@ -250,25 +250,25 @@ bool rf60x::set_CAN_interface(uint8_t value) {
   return set_param(value, CODE::PARAM_NAME_KEY::CAN_INTERFACE_POWER_SWITCH);
 }
 
-bool rf60x::set_destination_ip_address(std::string value) {
+bool rf60x::set_destination_ip_address(const std::string &value) {
 
   return set_param(converIPString(value),
                    CODE::PARAM_NAME_KEY::ZERO_BYTE_OF_DESTINATION_IP_ADDRESS);
 }
 
-bool rf60x::set_gateway_ip_address(std::string value) {
+bool rf60x::set_gateway_ip_address(const std::string &value) {
 
   return set_param(converIPString(value),
                    CODE::PARAM_NAME_KEY::ZERO_BYTE_OF_GATEWAY_IP_ADDRESS);
 }
 
-bool rf60x::set_subnet_mask(std::string value) {
+bool rf60x::set_subnet_mask(const std::string &value) {
 
   return set_param(converIPString(value),
                    CODE::PARAM_NAME_KEY::ZERO_BYTE_OF_SUBNET_MASK);
 }
 
-bool rf60x::set_source_ip_address(std::string value) {
+bool rf60x::set_source_ip_address(const std::string &value) {
 
   return set_param(converIPString(value),
                    CODE::PARAM_NAME_KEY::ZERO_BYTE_OF_SOURCE_IP_ADDRESS);
@@ -291,12 +291,11 @@ bool rf60x::set_protocol_type(uint8_t value) {
   return set_param(value, CODE::PARAM_NAME_KEY::PROTOCOLS_INTERFACE);
 }
 
-bool rf60x::open_serial_port(std::string comPortName, uint32_t baudRate) {
+bool rf60x::open_serial_port(const std::string &comPortName, uint32_t baudRate) {
   try {
     m_SerialManager->setBaud_rate(static_cast<BAUR_RATE_UART>(baudRate));
     return m_SerialManager->open_serial_port(comPortName);
   } catch (std::system_error &e) {
-    std::cout << "Error: " << e.what() << std::endl;
     return false;
   }
 }
@@ -319,7 +318,6 @@ bool rf60x::read_data_burst(char* buffer, size_t size) {
       if (!m_SerialManager->read_command(buffer + read, size - read))
         return false;
     } catch (const std::exception& e) {
-      std::cout << "Error when reading serial port: " << e.what() << std::endl;
       return false;
     }
 
@@ -621,7 +619,6 @@ std::pair<bool, T> rf60x::get_param(CODE::PARAM_NAME_KEY key) {
 
     return {true, result};
   } catch (std::exception &e) {
-    std::cout << e.what() << std::endl;
     return {false, 0};
   }
 }
@@ -631,9 +628,6 @@ bool rf60x::set_param(const T &value, CODE::PARAM_NAME_KEY key) {
   char ucBuffer[6];
   const std::size_t size = sizeof(T);
   const std::uint8_t *bytes = reinterpret_cast<const std::uint8_t *>(&value);
-
-  std::cout << "Value: " << value << std::endl;
-  std::cout << "Bytes: "<<std::endl;
 
   ucBuffer[0] = m_NetworkAddress & 0xFF;
   ucBuffer[1] = 0x80 | (static_cast<uint8_t>(RF60X_COMMAND::WRITEPARAM) & 0x0F);
@@ -645,8 +639,6 @@ bool rf60x::set_param(const T &value, CODE::PARAM_NAME_KEY key) {
       ucBuffer[2] = 0x80 | (param_key & 0x0F);
       ucBuffer[3] = 0x80 | ((param_key >> 4) & 0x0F);
 
-      std::cout << std::hex << static_cast<int>(bytes[i]) << " ";
-
       ucBuffer[4] = 0x80 | ((bytes[i] & 0x000F));
       ucBuffer[5] = 0x80 | (((bytes[i] & 0x00F0) >> 4));
 
@@ -655,7 +647,6 @@ bool rf60x::set_param(const T &value, CODE::PARAM_NAME_KEY key) {
       }
     }
   } catch (std::exception &e) {
-    std::cout << e.what() << std::endl;
     return false;
   }
 
@@ -697,7 +688,6 @@ template <typename T, typename U> std::pair<bool, U> rf60x::get_param_2(T key) {
 
     return {true, result};
   } catch (std::exception &e) {
-    std::cout << e.what() << std::endl;
     return {false, 0};
   }
 }
