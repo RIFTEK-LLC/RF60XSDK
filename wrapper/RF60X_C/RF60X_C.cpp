@@ -24,6 +24,7 @@ extern "C" {
     }
 
     EXPORTCALL void destroy_rf60x(rf60x_device dev) {
+        if (dev == nullptr) return;
         delete to_rf60x(dev);
     }
 

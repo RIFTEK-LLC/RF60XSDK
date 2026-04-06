@@ -37,7 +37,7 @@ public:
 
   rf60x &operator=(rf60x &&other) noexcept;
 
-  ~rf60x();
+  virtual ~rf60x();
 
   //-------------------------------------------------------//
 

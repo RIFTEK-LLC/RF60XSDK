@@ -229,7 +229,7 @@ bool rf60x::set_zero_point(uint16_t value) {
 }
 
 bool rf60x::set_CAN_interface_speed(uint8_t value) {
-  return set_param(value, CODE::PARAM_NAME_KEY::TIME_LOCK_OF_RESULT);
+  return set_param(value, CODE::PARAM_NAME_KEY::DATA_TRANSFER_RATE_VIA_CAN_INTERFACE);
 }
 
 bool rf60x::set_standard_identifier(uint16_t value) {
@@ -247,7 +247,7 @@ bool rf60x::set_CAN_interface_identifier(uint8_t value) {
 }
 
 bool rf60x::set_CAN_interface(uint8_t value) {
-  return set_param(value, CODE::PARAM_NAME_KEY::CAN_INTERFACE_IDENTIFIER);
+  return set_param(value, CODE::PARAM_NAME_KEY::CAN_INTERFACE_POWER_SWITCH);
 }
 
 bool rf60x::set_destination_ip_address(std::string value) {
@@ -526,7 +526,7 @@ bool rf60x::get_measure_uart(void* measure, PROTOCOL_MEASURE_UART type) {
             (tempButeBufferArray[0] & 0x40) >> 6;
 
         uint8_t advanced =
-            (tempButeBufferArray[4] & 0x0F) | (tempButeBufferArray[1] & 0x0F) << 4;
+            (tempButeBufferArray[4] & 0x0F) | (tempButeBufferArray[5] & 0x0F) << 4;
 
         reinterpret_cast<uart_stream_modified_measure_t*>(measure)->status =
             (advanced >> 0) & 1;
@@ -666,7 +666,7 @@ template <typename T, typename U> std::pair<bool, U> rf60x::get_param_2(T key) {
 
   std::vector<char> ip_values;
   U result = 0;
-  size_t num_bytes = sizeof(T);
+  size_t num_bytes = sizeof(U);
 
   char ucBuffer[4];
   ucBuffer[0] = m_NetworkAddress & 0xFF;
@@ -919,8 +919,10 @@ std::pair<bool, std::string> rf60x::get_ip_address(CODE::PARAM_NAME_KEY key) {
 uint32_t rf60x::converIPString(const std::string &str) {
   uint8_t ipValues[4];
 
-  sscanf(str.c_str(), "%hhu.%hhu.%hhu.%hhu", &ipValues[0],
-                        &ipValues[1], &ipValues[2], &ipValues[3]);
+  if (sscanf(str.c_str(), "%hhu.%hhu.%hhu.%hhu", &ipValues[0],
+                         &ipValues[1], &ipValues[2], &ipValues[3]) != 4) {
+    return 0;
+  }
 
   return (ipValues[0] << 24) | (ipValues[1] << 16) | (ipValues[2] << 8) |
          (ipValues[3]);
