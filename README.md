@@ -3,8 +3,8 @@
 [![C++](https://img.shields.io/badge/C%2B%2B-14-blue.svg)](https://isocpp.org/)
 [![CMake](https://img.shields.io/badge/CMake-3.18%2B-064F8C.svg)](https://cmake.org/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey.svg)]()
-[![CI](https://img.shields.io/github/actions/workflow/status/nikolay-kozhuro/rf60xsdk/c-cpp.yml?branch=master&label=CI&logo=github)]()
-[![Release](https://img.shields.io/github/v/release/nikolay-kozhuro/rf60xsdk?label=Release)]()
+[![CI](https://img.shields.io/github/actions/workflow/status/RIFTEK-LLC/RF60XSDK/c-cpp.yml?branch=master&label=CI&logo=github)]()
+[![Release](https://img.shields.io/github/v/release/RIFTEK-LLC/RF60XSDK?label=Release)]()
 
 SDK for **RIFTEK RF60X** laser displacement scanners. Provides a high-level C++ API with language bindings (C, Delphi) for device configuration, parameter read/write, and measurement streaming over **UART (RS-485)** and **UDP (Ethernet)**.
 
